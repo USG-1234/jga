@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ferdis JGA-Spielchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#1B1035; --night-2:#241547; --surface:#2E1B5C;
+  --pink:#FF3D7F; --teal:#2BD9C4; --gold:#FFD23F;
+  --cream:#F7F0FF; --muted:#A493C9;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1000px 500px at 50% -10%, #3A1F6E 0%, transparent 60%), var(--night);
+  color:var(--cream); font-family:'Outfit',system-ui,sans-serif;
+  min-height:100vh; padding:14px 14px 40px; overscroll-behavior:contain;
+}
+.wrap{max-width:520px;margin:0 auto}
+
+header{text-align:center;margin:6px 0 18px}
+h1{font-family:'Bungee',cursive;font-size:clamp(26px,8vw,38px);line-height:.95;margin:0;
+   color:var(--gold);text-shadow:3px 3px 0 var(--pink);letter-spacing:.5px}
+header p{margin:8px 0 0;color:var(--muted);font-size:13px}
+
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tcard{background:var(--night-2);border:2px solid rgba(255,255,255,.08);border-radius:16px;
+       padding:10px 8px;text-align:center;position:relative;overflow:hidden}
+.tcard .bar{position:absolute;top:0;left:0;right:0;height:5px}
+.tcard.t0 .bar{background:var(--pink)} .tcard.t1 .bar{background:var(--teal)} .tcard.t2 .bar{background:var(--gold)}
+.tcard.lead{border-color:var(--gold)}
+.tname{font-weight:800;font-size:14px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tplay{font-size:11px;color:var(--muted);min-height:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpts{font-family:'Bungee',cursive;font-size:30px;line-height:1.1;margin-top:2px}
+.tcard.t0 .tpts{color:var(--pink)} .tcard.t1 .tpts{color:var(--teal)} .tcard.t2 .tpts{color:var(--gold)}
+.crown{position:absolute;top:6px;right:8px;font-size:14px}
+
+button{font-family:'Outfit',sans-serif;cursor:pointer;border:none}
+.btn{display:block;width:100%;padding:16px;border-radius:16px;font-size:17px;font-weight:800;
+     color:var(--night);background:var(--gold);box-shadow:0 5px 0 #C79E12;margin-bottom:12px;
+     transition:transform .08s, box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C79E12}
+.btn.pink{background:var(--pink);color:#fff;box-shadow:0 5px 0 #B31E53}
+.btn.pink:active{box-shadow:0 1px 0 #B31E53}
+.btn.teal{background:var(--teal);color:var(--night);box-shadow:0 5px 0 #1B9E8E}
+.btn.teal:active{box-shadow:0 1px 0 #1B9E8E}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;
+           border:2px solid rgba(255,255,255,.14);font-size:15px;padding:13px}
+.btn.ghost:active{transform:translateY(2px)}
+.btn:disabled{opacity:.45}
+.btn.sm{font-size:14px;padding:11px;margin-bottom:8px}
+.btn.ghost.act{background:var(--gold);color:var(--night);border-color:var(--gold);font-weight:800}
+.row{display:flex;gap:10px}
+.row .btn{flex:1}
+
+.panel{background:var(--night-2);border-radius:22px;padding:18px;margin-bottom:14px;border:2px solid rgba(255,255,255,.07)}
+.eyebrow{color:var(--muted);font-size:13px;margin:0 0 6px}
+h2{font-family:'Bungee',cursive;font-size:22px;margin:0 0 10px;line-height:1.15}
+.screen{display:none} .screen.on{display:block}
+.tag{display:inline-block;background:var(--pink);color:#fff;font-size:11px;font-weight:800;
+     border-radius:20px;padding:3px 9px;margin-left:6px;vertical-align:middle}
+
+.wheelbox{position:relative;width:min(320px,86vw);margin:0 auto 16px;aspect-ratio:1}
+.wheelrot{width:100%;height:100%;transform:rotate(0deg)}
+canvas{width:100%;height:100%;display:block;border-radius:50%;box-shadow:0 0 0 6px var(--surface),0 12px 30px rgba(0,0,0,.5)}
+.needle{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;
+        border-left:15px solid transparent;border-right:15px solid transparent;
+        border-top:28px solid var(--gold);filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));z-index:3}
+
+.duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin:14px 0}
+.slot{background:var(--surface);border-radius:16px;padding:14px 8px;text-align:center;border:3px solid transparent}
+.slot.p0{border-color:var(--pink)} .slot.p1{border-color:var(--teal)} .slot.p2{border-color:var(--gold)}
+.slot b{display:block;font-size:16px} .slot span{font-size:11px;color:var(--muted)}
+.vs{font-family:'Bungee',cursive;font-size:20px;color:var(--gold)}
+.ref{text-align:center;background:var(--surface);border-radius:14px;padding:10px;font-size:14px}
+.first{text-align:center;color:var(--gold);font-weight:800;font-size:15px;margin-top:10px}
+
+.reveal{text-align:center;padding:26px 14px}
+.multi{font-family:'Bungee',cursive;font-size:clamp(48px,20vw,86px);line-height:1;color:var(--gold);text-shadow:4px 4px 0 var(--pink);min-height:.9em}
+.bigpts{font-family:'Bungee',cursive;font-size:clamp(56px,24vw,104px);line-height:1;color:var(--cream)}
+.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.drumhint{font-family:'Bungee',cursive;font-size:17px;color:var(--pink);min-height:20px;margin:10px 0 2px;letter-spacing:.5px}
+.shake{animation:shake .11s infinite}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-1px)}100%{transform:translate(0,0)}}
+.slam{animation:slam .5s cubic-bezier(.2,1.8,.3,1)}
+@keyframes slam{0%{transform:scale(2.6);opacity:0}55%{transform:scale(.88)}100%{transform:scale(1);opacity:1}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden}
+.confetti i{position:absolute;top:-24px;width:9px;height:15px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(760deg)}}
+
+.stage{background:var(--surface);border-radius:18px;padding:22px 14px;text-align:center;
+       min-height:200px;display:flex;align-items:center;justify-content:center;
+       flex-direction:column;gap:12px;margin-bottom:12px}
+.bigemoji{font-size:clamp(80px,26vw,120px);line-height:1}
+.blurring{animation:sharpen 10s linear forwards}
+@keyframes sharpen{0%{filter:blur(36px)}100%{filter:blur(0)}}
+.answer{font-family:'Bungee',cursive;font-size:clamp(20px,6vw,28px);color:var(--gold);line-height:1.2}
+.clue{background:rgba(255,255,255,.08);border-radius:12px;padding:11px 13px;font-size:15px;text-align:left;width:100%}
+.scoreline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:13px;margin-bottom:10px;color:var(--muted)}
+.scoreline b{color:var(--cream);font-size:15px}
+.guessrow{display:flex;gap:8px;align-items:center;width:100%}
+.guessrow label{flex:0 0 40%;margin:0;font-size:13px}
+.guessrow input{margin:0}
+.reactbox{width:100%;height:300px;border-radius:16px;overflow:hidden;display:flex;
+  flex-direction:column;position:relative;user-select:none;-webkit-user-select:none}
+.reactzone{flex:1;display:flex;align-items:center;justify-content:center;background:#3B2570;
+  border-bottom:3px solid rgba(0,0,0,.35);font-weight:800;font-size:13px;color:rgba(255,255,255,.55);cursor:pointer}
+.reactzone:last-child{border-bottom:none}
+#rzA span{transform:rotate(180deg)}
+.reactbox.go .reactzone{background:#1FA84A}
+.reactbox.red .reactzone{background:#D63B3B}
+.reactbox.yellow .reactzone{background:#D9AF2B}
+.reactbox.blue .reactzone{background:#2F6FD0}
+.reactmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;font-family:'Bungee',cursive;font-size:clamp(20px,6.5vw,32px);color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,.45);text-align:center;padding:0 14px;line-height:1.2}
+
+.list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.item{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;
+      justify-content:space-between;align-items:center;gap:10px;font-size:15px;text-align:left}
+.item.used{opacity:.4}
+.item small{display:block;color:var(--muted);font-size:12px;margin-top:3px;font-weight:400}
+.item.tap{width:100%;color:var(--cream);border:none}
+.del{background:none;color:var(--muted);font-size:20px;padding:0 4px;line-height:1}
+input,textarea,select{width:100%;background:var(--night);border:2px solid rgba(255,255,255,.12);
+  border-radius:12px;color:var(--cream);padding:12px;font-size:15px;font-family:'Outfit',sans-serif;margin-bottom:8px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+.setupteam{background:var(--surface);border-radius:16px;padding:14px;margin-bottom:10px}
+.rules{background:var(--surface);border-radius:14px;padding:14px;font-size:15px;line-height:1.5}
+.log{font-size:13px;color:var(--muted);line-height:1.6}
+.log div{padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.modal{position:fixed;inset:0;background:rgba(12,7,26,.85);display:none;align-items:center;
+  justify-content:center;z-index:200;padding:22px}
+.modal.on{display:flex}
+.modalbox{background:var(--night-2);border:2px solid rgba(255,255,255,.14);border-radius:20px;
+  padding:20px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.modalbox p{margin:0 0 16px;font-size:16px;line-height:1.45}
+.modalbox .btn{margin-bottom:0}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.shake,.blurring{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Ferdis<br>JGA-Spielchen</h1>
+  <p>3 Teams. Ein Abend. Keine Gnade.</p>
+</header>
+
+<!-- SETUP -->
+<section id="s-setup" class="screen on">
+  <div class="panel">
+    <h2>Teams eintragen</h2>
+    <div id="setupTeams"></div>
+    <button class="btn" onclick="startNight()">Los geht's</button>
+  </div>
+</section>
+
+<!-- HUB -->
+<section id="s-hub" class="screen">
+  <div class="board" id="board"></div>
+  <button class="btn ghost" id="resumeBtn" style="display:none" onclick="show('s-rules')">Laufende Runde fortsetzen</button>
+  <p class="eyebrow" style="text-align:center;margin-bottom:6px">Was geht gerade?</p>
+  <div class="row" id="modeRow" style="margin-bottom:12px">
+    <button class="btn ghost sm" data-m="bar" onclick="setMode('bar')">Bar</button>
+    <button class="btn ghost sm" data-m="phone" onclick="setMode('phone')">Handy</button>
+    <button class="btn ghost sm" data-m="both" onclick="setMode('both')">Beides</button>
+  </div>
+  <button class="btn pink" onclick="openGameWheel()">Spiel auslosen</button>
+  <div class="row">
+    <button class="btn teal" onclick="show('s-bonus');renderBonus()">Bonuspunkte</button>
+    <button class="btn ghost" onclick="show('s-manage');renderManage()">Verwalten</button>
+  </div>
+  <div class="panel">
+    <p class="eyebrow">Verlauf</p>
+    <div class="log" id="log"><div>Noch nichts passiert.</div></div>
+  </div>
+  <p class="eyebrow" style="text-align:center" id="saveStatus">Wird gespeichert…</p>
+  <div class="row">
+    <button class="btn ghost sm" id="soundBtn" onclick="toggleSound()">Ton an</button>
+    <button class="btn ghost sm" onclick="resetNight()">Neuer Abend</button>
+  </div>
+</section>
+
+<!-- SPIEL-RAD -->
+<section id="s-gamewheel" class="screen">
+  <div class="panel">
+    <h2>Welches Spiel?</h2>
+    <p class="eyebrow" id="gamesLeft"></p>
+    <div class="wheelbox">
+      <div class="needle"></div>
+      <div class="wheelrot" id="gameRot"><canvas id="gameCanvas"></canvas></div>
+    </div>
+    <button class="btn" id="spinGameBtn" onclick="spinGame()">Rad drehen</button>
+    <button class="btn ghost" onclick="show('s-hub')">Zurück</button>
+  </div>
+</section>
+
+<!-- AUSLOSUNG -->
+<section id="s-draw" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="drawGame"></p>
+    <h2>Die Auslosung</h2>
+    <div class="duel" id="duel"></div>
+    <div class="ref" id="refLine"></div>
+    <p class="first" id="firstLine"></p>
+    <button class="btn" onclick="show('s-rules')">Regeln ansehen</button>
+    <button class="btn ghost" onclick="drawTeams()">Nochmal auslosen</button>
+  </div>
+</section>
+
+<!-- REGELN -->
+<section id="s-rules" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="rulesMatch"></p>
+    <h2 id="rulesTitle"></h2>
+    <div class="rules" id="rulesText"></div>
+    <button class="btn pink" style="margin-top:14px" id="rulesGo"></button>
+    <button class="btn ghost" onclick="show('s-draw')">Zurück</button>
+  </div>
+</section>
+
+<!-- HANDY-SPIEL -->
+<section id="s-play" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="playTitle"></p>
+    <div class="scoreline" id="playScore"></div>
+    <div class="stage" id="playStage"></div>
+    <div id="playControls"></div>
+    <button class="btn ghost" onclick="clearReact();show('s-rules')">Abbrechen</button>
+  </div>
+</section>
+
+<!-- SIEGER -->
+<section id="s-winner" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="winnerGame"></p>
+    <h2>Wer hat gewonnen?</h2>
+    <div id="winnerBtns"></div>
+    <button class="btn ghost" onclick="show('s-rules')">Zurück zu den Regeln</button>
+  </div>
+</section>
+
+<!-- PUNKTE -->
+<section id="s-score" class="screen">
+  <div class="panel reveal" id="scorePanel">
+    <p class="eyebrow" id="scoreTeam"></p>
+    <div class="bigpts pop" id="ptsText"></div>
+    <p class="drumhint" id="drumHint"></p>
+    <div class="multi" id="multiText"></div>
+    <p class="eyebrow" id="scoreTotal"></p>
+    <button class="btn pink" id="scoreNext" style="margin-top:18px" onclick="show('s-punish')">Weiter zur Bestrafung</button>
+  </div>
+</section>
+
+<!-- BESTRAFUNG -->
+<section id="s-punish" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="punishLoser"></p>
+    <h2>Shot oder Strafe?</h2>
+    <button class="btn" onclick="chooseShot()">Shot kippen</button>
+    <button class="btn pink" onclick="openPenaltyWheel()">Strafe drehen</button>
+  </div>
+</section>
+
+<!-- STRAFRAD -->
+<section id="s-penwheel" class="screen">
+  <div class="panel">
+    <h2>Das Strafrad</h2>
+    <p class="eyebrow" id="pensLeft"></p>
+    <div class="wheelbox">
+      <div class="needle"></div>
+      <div class="wheelrot" id="penRot"><canvas id="penCanvas"></canvas></div>
+    </div>
+    <button class="btn pink" id="spinPenBtn" onclick="spinPenalty()">Rad drehen</button>
+  </div>
+</section>
+
+<section id="s-penresult" class="screen">
+  <div class="panel reveal">
+    <p class="eyebrow" id="penTeam"></p>
+    <h2 id="penText" style="font-size:24px"></h2>
+    <button class="btn" style="margin-top:20px" onclick="finishRound()">Erledigt, nächste Runde</button>
+    <button class="btn ghost" onclick="openPenaltyWheel()">Nochmal drehen</button>
+  </div>
+</section>
+
+<!-- BONUS -->
+<section id="s-bonus" class="screen">
+  <div class="panel">
+    <h2>Bonuspunkte</h2>
+    <p class="eyebrow">Antippen, dann Team wählen. Gibt zufällig 1–3 Punkte.</p>
+    <div class="list" id="bonusList"></div>
+    <button class="btn ghost" onclick="show('s-hub')">Zurück</button>
+  </div>
+</section>
+<section id="s-bonusteam" class="screen">
+  <div class="panel">
+    <p class="eyebrow" id="bonusChosen"></p>
+    <h2>Für welches Team?</h2>
+    <div id="bonusTeamBtns"></div>
+    <button class="btn ghost" onclick="show('s-bonus')">Abbrechen</button>
+  </div>
+</section>
+<section id="s-bonusreveal" class="screen">
+  <div class="panel reveal">
+    <p class="eyebrow" id="bonusRevealTeam"></p>
+    <div class="bigpts pop" id="bonusPts"></div>
+    <p class="eyebrow" id="bonusRevealName"></p>
+    <button class="btn" style="margin-top:18px" onclick="show('s-hub');renderAll()">Weiter</button>
+  </div>
+</section>
+
+<!-- VERWALTEN -->
+<section id="s-manage" class="screen">
+  <div class="panel">
+    <h2>Spiel hinzufügen</h2>
+    <label for="ngName">Name</label>
+    <input id="ngName" placeholder="z.B. Flunkyball">
+    <label for="ngRule">Regel in einem Satz</label>
+    <textarea id="ngRule" rows="2" placeholder="Kurz erklären, wie es geht"></textarea>
+    <button class="btn teal" onclick="addGame()">Spiel speichern</button>
+  </div>
+  <div class="panel">
+    <h2>Strafe hinzufügen</h2>
+    <input id="npName" placeholder="z.B. Eine Bar lang nur flüstern">
+    <button class="btn pink" onclick="addPenalty()">Strafe speichern</button>
+  </div>
+  <div class="panel">
+    <h2>Bonus hinzufügen</h2>
+    <input id="nbName" placeholder="z.B. Fremde zum Mitsingen bringen">
+    <button class="btn" onclick="addBonus()">Bonus speichern</button>
+  </div>
+  <div class="panel">
+    <h2>Alles im Überblick</h2>
+    <p class="eyebrow">Ausgegraute waren schon dran und kommen nicht nochmal aufs Rad.</p>
+    <p class="eyebrow" id="gHead"></p>
+    <div class="list" id="mGames"></div>
+    <button class="btn ghost sm" onclick="state.usedGames=[];renderManage()">Alle Spiele wieder freigeben</button>
+    <p class="eyebrow" id="pHead"></p>
+    <div class="list" id="mPens"></div>
+    <button class="btn ghost sm" onclick="state.usedPenalties=[];renderManage()">Alle Strafen wieder freigeben</button>
+    <p class="eyebrow">Bonus</p>
+    <div class="list" id="mBonus"></div>
+  </div>
+  <button class="btn ghost" onclick="show('s-hub')">Zurück</button>
+</section>
+
+</div>
+
+<div id="modal" class="modal">
+  <div class="modalbox">
+    <p id="modalText"></p>
+    <div class="row" id="modalBtns"></div>
+  </div>
+</div>
+
+<script>
+/* ================= Inhalte für die Handy-Spiele ================= */
+const CONTENT = {
+  blur:[
+    {e:'🐘',a:'Elefant'},{e:'🗼',a:'Eiffelturm'},{e:'🍕',a:'Pizza'},{e:'🚁',a:'Hubschrauber'},
+    {e:'🦩',a:'Flamingo'},{e:'🎸',a:'Gitarre'},{e:'🏰',a:'Schloss'},{e:'🐙',a:'Krake'},
+    {e:'🚀',a:'Rakete'},{e:'🍍',a:'Ananas'},{e:'🦒',a:'Giraffe'},{e:'⚓',a:'Anker'},
+    {e:'🎺',a:'Trompete'},{e:'🐧',a:'Pinguin'},{e:'🌋',a:'Vulkan'},{e:'🚂',a:'Lokomotive'},
+    {e:'🍄',a:'Pilz'},{e:'🦈',a:'Hai'},{e:'🎯',a:'Dartscheibe'},{e:'🥁',a:'Schlagzeug'},
+    {e:'🦉',a:'Eule'},{e:'🌵',a:'Kaktus'},{e:'🧯',a:'Feuerlöscher'},{e:'🪗',a:'Akkordeon'},
+    {e:'🧲',a:'Magnet'},{e:'🔭',a:'Teleskop'},{e:'🦡',a:'Dachs'},{e:'🧿',a:'Nazar-Amulett'},
+    {e:'🛎️',a:'Rezeptionsklingel'},{e:'🧵',a:'Garnrolle'},{e:'🧊',a:'Eiswürfel'},{e:'🦭',a:'Robbe'},
+    {e:'🛷',a:'Schlitten'},{e:'🧰',a:'Werkzeugkasten'},{e:'🦂',a:'Skorpion'},{e:'🧪',a:'Reagenzglas'},
+    {e:'🛴',a:'Roller'},{e:'🦦',a:'Otter'},{e:'🪴',a:'Zimmerpflanze'},{e:'🪜',a:'Leiter'},
+    {e:'🦥',a:'Faultier'},{e:'🪁',a:'Drachen'},{e:'🧭',a:'Kompass'},{e:'🦔',a:'Igel'},
+    {e:'🗿',a:'Osterinsel-Statue'},{e:'🧱',a:'Ziegelmauer'},{e:'🪑',a:'Stuhl'},{e:'🎻',a:'Geige'}
+  ],
+  flag:[
+    {e:'🇧🇷',a:'Brasilien'},{e:'🇵🇹',a:'Portugal'},{e:'🇯🇵',a:'Japan'},{e:'🇦🇷',a:'Argentinien'},
+    {e:'🇿🇦',a:'Südafrika'},{e:'🇬🇷',a:'Griechenland'},{e:'🇰🇷',a:'Südkorea'},{e:'🇳🇴',a:'Norwegen'},
+    {e:'🇲🇽',a:'Mexiko'},{e:'🇮🇳',a:'Indien'},{e:'🇨🇦',a:'Kanada'},{e:'🇹🇷',a:'Türkei'},
+    {e:'🇵🇱',a:'Polen'},{e:'🇮🇪',a:'Irland'},{e:'🇨🇭',a:'Schweiz'},{e:'🇻🇳',a:'Vietnam'},
+    {e:'🇲🇦',a:'Marokko'},{e:'🇨🇱',a:'Chile'},{e:'🇭🇷',a:'Kroatien'},{e:'🇸🇪',a:'Schweden'},
+    {e:'🇦🇺',a:'Australien'},{e:'🇪🇬',a:'Ägypten'},{e:'🇺🇦',a:'Ukraine'},{e:'🇮🇩',a:'Indonesien'},
+    {e:'🇸🇰',a:'Slowakei'},{e:'🇸🇮',a:'Slowenien'},{e:'🇷🇸',a:'Serbien'},{e:'🇧🇬',a:'Bulgarien'},
+    {e:'🇷🇴',a:'Rumänien'},{e:'🇱🇹',a:'Litauen'},{e:'🇪🇪',a:'Estland'},{e:'🇵🇾',a:'Paraguay'},
+    {e:'🇺🇾',a:'Uruguay'},{e:'🇵🇪',a:'Peru'},{e:'🇧🇴',a:'Bolivien'},{e:'🇰🇪',a:'Kenia'},
+    {e:'🇳🇬',a:'Nigeria'},{e:'🇬🇭',a:'Ghana'},{e:'🇹🇳',a:'Tunesien'},{e:'🇯🇴',a:'Jordanien'},
+    {e:'🇳🇵',a:'Nepal'},{e:'🇱🇰',a:'Sri Lanka'},{e:'🇲🇾',a:'Malaysia'},{e:'🇵🇭',a:'Philippinen'},
+    {e:'🇳🇿',a:'Neuseeland'},{e:'🇮🇸',a:'Island'},{e:'🇫🇮',a:'Finnland'},{e:'🇦🇱',a:'Albanien'},
+    {e:'🇲🇹',a:'Malta'},{e:'🇲🇳',a:'Mongolei'},{e:'🇰🇿',a:'Kasachstan'},{e:'🇶🇦',a:'Katar'},
+    {e:'🇱🇺',a:'Luxemburg'},{e:'🇨🇴',a:'Kolumbien'},{e:'🇻🇪',a:'Venezuela'},{e:'🇧🇦',a:'Bosnien und Herzegowina'}
+  ],
+  clue:[
+    {a:'Porto',c:['Über den Fluss führt eine Eisenbrücke von einem Schüler Eiffels','Der Wein aus den Kellern am anderen Ufer trägt den Namen der Stadt','Die zweitgrößte Stadt Portugals']},
+    {a:'Neapel',c:['Ein Vulkan schaut der Stadt direkt über die Schulter','Hier wurde die Pizza erfunden','Die größte Stadt Süditaliens']},
+    {a:'Marseille',c:['Ältester Hafen Frankreichs, gegründet von Griechen','Bouillabaisse und ein Fußballverein mit sehr lauten Fans','Die zweitgrößte Stadt Frankreichs, am Mittelmeer']},
+    {a:'Krakau',c:['Ein Trompeter bricht hier jede Stunde mitten im Lied ab','Der größte mittelalterliche Marktplatz Europas','Die alte Königsstadt Polens']},
+    {a:'Sevilla',c:['Der Turm der Kathedrale war ursprünglich ein Minarett','Flamenco, Orangenbäume und eine berühmte Karwoche','Die Hauptstadt Andalusiens']},
+    {a:'Rotterdam',c:['Die Innenstadt ist komplett modern, weil die alte 1940 zerstört wurde','Der größte Hafen Europas','Die zweitgrößte Stadt der Niederlande']},
+    {a:'Turin',c:['Ein Turm hier war ursprünglich als Synagoge geplant','Heimat von Fiat und eines berühmten Leichentuchs','Die Hauptstadt des Piemont']},
+    {a:'Thessaloniki',c:['Ein weißer Turm am Wasser ist das Wahrzeichen','Benannt nach einer Halbschwester von Alexander dem Großen','Die zweitgrößte Stadt Griechenlands']},
+    {a:'Izmir',c:['Früher hieß die Stadt Smyrna','Die Ruinen von Ephesos liegen gleich um die Ecke','Die drittgrößte Stadt der Türkei, an der Ägäis']},
+    {a:'Casablanca',c:['Eine riesige Moschee steht hier halb über dem Meer','Ein alter Schwarzweißfilm machte den Namen weltberühmt','Die größte Stadt Marokkos']},
+    {a:'Medellín',c:['Eine Seilbahn ist hier ganz normaler Nahverkehr den Hang hoch','Früher als gefährlichste Stadt der Welt verschrien, heute Vorzeigeprojekt','Die zweitgrößte Stadt Kolumbiens']},
+    {a:'Osaka',c:['Die Leute hier sagen, man solle sich beim Essen ruinieren','Takoyaki, eine berühmte Burg, und auf der Rolltreppe steht man links','Die große Hafenstadt westlich von Tokio']},
+    {a:'Busan',c:['Größter Hafen des Landes mit einem riesigen Fischmarkt','Ein bekanntes Filmfestival und der Strand Haeundae','Die zweitgrößte Stadt Südkoreas']},
+    {a:'Vancouver',c:['Berge, Meer und Regenwald an einem Ort','Ein riesiger Stadtpark liegt auf einer Halbinsel','Die größte Stadt im Westen Kanadas']},
+    {a:'Melbourne',c:['Das größte Straßenbahnnetz der Welt','Kaffeekultur, bemalte Gassen und ein Formel-1-Rennen','Die zweitgrößte Stadt Australiens']},
+    {a:'Sankt Petersburg',c:['Im Sommer wird es hier nachts nicht richtig dunkel','Ein grün-weißer Palast voller Kunst am Fluss','Die zweitgrößte Stadt Russlands, an der Ostsee']},
+    {a:'Glasgow',c:['Die größte Stadt des Landes, aber nicht die Hauptstadt','Zwei Fußballklubs, die sich seit über hundert Jahren bekriegen','Die größte Stadt Schottlands']},
+    {a:'Antwerpen',c:['Ein großer Teil des weltweiten Diamantenhandels läuft über diese Stadt','Rubens hat hier gelebt und gemalt','Die größte Stadt Flanderns']},
+    {a:'Göteborg',c:['Ein alter Vergnügungspark liegt mitten in der Stadt','Volvo kommt von hier','Die zweitgrößte Stadt Schwedens']},
+    {a:'Alexandria',c:['Hier stand ein Leuchtturm, eines der sieben Weltwunder','Die berühmteste Bibliothek der Antike stand hier','Die zweitgrößte Stadt Ägyptens, am Mittelmeer']},
+    {a:'Valencia',c:['Eine Stadt aus weißen Zukunftsbauten steht in einem trockengelegten Flussbett','Von hier kommt die Paella','Die drittgrößte Stadt Spaniens']},
+    {a:'Danzig',c:['Hier fielen die ersten Schüsse des Zweiten Weltkriegs','Bernstein und eine Werft, in der eine Gewerkschaft Geschichte schrieb','Die große Hafenstadt im Norden Polens']},
+    {a:'Lyon',c:['Hier wurde das Kino erfunden','Gilt als heimliche Hauptstadt der französischen Küche','Drittgrößte Stadt Frankreichs, zwei Flüsse treffen sich']},
+    {a:'Palermo',c:['In den Katakomben stehen hunderte angezogene Mumien','Arabische, normannische und spanische Spuren in einer Altstadt','Die Hauptstadt Siziliens']},
+    {a:'Frankfurt',c:['Mitten in Deutschland steht hier eine echte Skyline','Apfelwein und Grüne Soße','Die Heimat der Eintracht']},
+    {a:'Reykjavík',c:['Die nördlichste Hauptstadt der Welt','Heißes Wasser kommt hier direkt aus dem Boden','Die Hauptstadt von Island']}
+  ],
+  emoji:[
+    {e:'🔥🚒👨‍🚒',a:'Feuerwehr'},{e:'🎂🎈🎁',a:'Geburtstag'},{e:'🧛🦇🩸',a:'Vampir'},
+    {e:'🏖️🌴🍹',a:'Urlaub'},{e:'🚑🏥👨‍⚕️',a:'Krankenhaus'},{e:'🎣🐟🛶',a:'Angeln'},
+    {e:'🍺🥨🎡',a:'Oktoberfest'},{e:'👰🤵💍',a:'Hochzeit'},{e:'🍿🎬🪑',a:'Kino'},
+    {e:'🚀🌕👨‍🚀',a:'Mondlandung'},{e:'🍫🐰🥚',a:'Ostern'},{e:'🎅🦌🎄',a:'Weihnachten'},
+    {e:'⚽🥅🧤',a:'Torwart'},{e:'🦷🪥👨‍⚕️',a:'Zahnarzt'},{e:'🧅😭🔪',a:'Zwiebeln schneiden'},
+    {e:'💇‍♂️✂️💈',a:'Friseur'},{e:'🕵️🔍👣',a:'Detektiv'},{e:'🏴‍☠️⚓💰',a:'Piraten'},
+    {e:'🐺🌕🌲',a:'Werwolf'},{e:'🚿🎤🧴',a:'Singen unter der Dusche'},
+    {e:'☕📰🌅',a:'Frühstück'},{e:'🧗⛰️🪢',a:'Klettern'},
+    {e:'🧊🚢🌊',a:'Titanic'},{e:'🍎🎯👦',a:'Wilhelm Tell'},{e:'🐍🍎🌳',a:'Sündenfall'},
+    {e:'🧀🐭🪤',a:'Mausefalle'},{e:'⚖️👩‍⚖️🔨',a:'Gerichtsverhandlung'},{e:'🪂✈️😱',a:'Fallschirmsprung'},
+    {e:'🥊🏆🧤',a:'Boxkampf'},{e:'🎰🍒💰',a:'Spielautomat'},{e:'🚲🏔️🇫🇷',a:'Tour de France'},
+    {e:'📚🦉🎓',a:'Studium'},{e:'🪐🔭🌌',a:'Astronomie'},{e:'🐫🏜️🧭',a:'Karawane'},
+    {e:'🌊🏄‍♂️🩳',a:'Surfen'},{e:'💣⏱️😰',a:'Zeitbombe'},{e:'🐔🥚❓',a:'Henne-Ei-Problem'},
+    {e:'🎻🎼🎩',a:'Orchester'},{e:'🌪️🏠🥿',a:'Der Zauberer von Oz'},{e:'🎪🤹🐘',a:'Zirkus'},
+    {e:'🏔️🎿☃️',a:'Skiurlaub'},{e:'🚬🚭🙅',a:'Rauchverbot'},{e:'🧭🗺️🏴‍☠️',a:'Schatzsuche'},
+    {e:'🌡️🤒🛌',a:'Grippe'},{e:'💡🧠❗',a:'Geistesblitz'},{e:'🕯️👻🏚️',a:'Spukhaus'},
+    {e:'🥁🐒🔋',a:'Batterie-Werbung'},{e:'🪞👸🍎',a:'Schneewittchen'},{e:'🐸👑💋',a:'Froschkönig'},
+    {e:'👣🏝️⛵',a:'Robinson Crusoe'}
+  ],
+  high:[
+    {q:'Wer hat mehr Einwohner?',l:{t:'Berlin',v:'3,7 Mio'},r:{t:'Madrid',v:'3,3 Mio'},w:'l'},
+    {q:'Was ist höher?',l:{t:'Eiffelturm',v:'330 m'},r:{t:'Empire State Building',v:'381 m'},w:'r'},
+    {q:'Was ist älter?',l:{t:'Pyramiden von Gizeh',v:'ca. 4.600 Jahre'},r:{t:'Stonehenge',v:'ca. 5.000 Jahre'},w:'r'},
+    {q:'Was ist schwerer?',l:{t:'Blauwal',v:'ca. 150 t'},r:{t:'Airbus A380, leer',v:'ca. 277 t'},w:'r'},
+    {q:'Was ist länger?',l:{t:'Rhein',v:'1.230 km'},r:{t:'Donau',v:'2.850 km'},w:'r'},
+    {q:'Wo ist es im Jahresschnitt wärmer?',l:{t:'Athen',v:'18,8 °C'},r:{t:'Rom',v:'15,7 °C'},w:'l'},
+    {q:'Was hat mehr Kalorien pro 100 g?',l:{t:'Erdnüsse',v:'567 kcal'},r:{t:'Milchschokolade',v:'535 kcal'},w:'l'},
+    {q:'Wer hat mehr Beine?',l:{t:'Tausendfüßler',v:'bis 750'},r:{t:'Hundertfüßler',v:'bis 350'},w:'l'},
+    {q:'Was ist die größere Strecke?',l:{t:'Marianengraben, Tiefe',v:'10.994 m'},r:{t:'Mount Everest, Höhe',v:'8.849 m'},w:'l'},
+    {q:'Welche Metropolregion ist größer?',l:{t:'Tokio',v:'ca. 37 Mio'},r:{t:'Delhi',v:'ca. 33 Mio'},w:'l'},
+    {q:'Was ist schneller?',l:{t:'Gepard',v:'110 km/h'},r:{t:'Wanderfalke im Sturzflug',v:'ca. 350 km/h'},w:'r'},
+    {q:'Welches Land ist flächenmäßig größer?',l:{t:'Frankreich',v:'551.000 km²'},r:{t:'Spanien',v:'506.000 km²'},w:'l'},
+    {q:'Welche Uni ist älter?',l:{t:'Heidelberg',v:'1386'},r:{t:'Wien',v:'1365'},w:'r'},
+    {q:'Wer wird älter?',l:{t:'Galapagos-Riesenschildkröte',v:'bis ca. 175 Jahre'},r:{t:'Grönlandhai',v:'bis ca. 400 Jahre'},w:'r'},
+    {q:'Was ist weiter von Frankfurt entfernt?',l:{t:'New York',v:'ca. 6.200 km'},r:{t:'Kapstadt',v:'ca. 9.000 km'},w:'r'},
+    {q:'Was hat mehr Zucker pro halbem Liter?',l:{t:'Cola',v:'ca. 53 g'},r:{t:'Apfelsaft',v:'ca. 55 g'},w:'r'},
+    {q:'Was ist schwerer, ein Kubikmeter?',l:{t:'Wasser',v:'1.000 kg'},r:{t:'Ziegel',v:'ca. 1.900 kg'},w:'r'},
+    {q:'Was war früher?',l:{t:'Gutenbergs Buchdruck',v:'um 1450'},r:{t:'Kolumbus in Amerika',v:'1492'},w:'l'},
+    {q:'Wer hat mehr Einwohner?',l:{t:'Kanada',v:'ca. 41 Mio'},r:{t:'Polen',v:'ca. 37 Mio'},w:'l'},
+    {q:'Was ist höher?',l:{t:'Kölner Dom',v:'157 m'},r:{t:'Cheops-Pyramide',v:'139 m'},w:'l'},
+    {q:'Was hat mehr Fläche?',l:{t:'Bodensee',v:'536 km²'},r:{t:'Malta',v:'316 km²'},w:'l'},
+    {q:'Was dauert länger?',l:{t:'Ein Tag auf der Venus',v:'243 Erdtage'},r:{t:'Ein Jahr auf der Venus',v:'225 Erdtage'},w:'l'},
+    {q:'Wer hat mehr Knochen?',l:{t:'Ein Neugeborenes',v:'ca. 300'},r:{t:'Ein Erwachsener',v:'206'},w:'l'},
+    {q:'Was ist heißer?',l:{t:'Sonnenoberfläche',v:'ca. 5.500 °C'},r:{t:'Ein Blitz',v:'bis 30.000 °C'},w:'r'},
+    {q:'Was ist teurer pro Kilo?',l:{t:'Safran',v:'ca. 10.000 €'},r:{t:'Gold',v:'weit über 50.000 €'},w:'r'},
+    {q:'Was ist älter?',l:{t:'Hamburger Speicherstadt',v:'ab 1885'},r:{t:'Eiffelturm',v:'1889'},w:'l'},
+    {q:'Was ist tiefer?',l:{t:'Tiefste U-Bahn-Station der Welt',v:'ca. 105 m'},r:{t:'Tiefste Stelle der Ostsee',v:'459 m'},w:'r'}
+  ],
+  react:[{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},
+         {a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'}],
+  guess:[
+    {q:'Wie viele Einwohner hat Island?',a:390000},
+    {q:'Wie hoch ist der Eiffelturm in Metern?',a:330},
+    {q:'Wie viele Knochen hat ein erwachsener Mensch?',a:206},
+    {q:'Wie viele Liter Bier trinkt ein Deutscher im Schnitt pro Jahr?',a:88},
+    {q:'Wie tief ist der Marianengraben in Metern?',a:10994},
+    {q:'Wie viele Minuten hat ein Jahr?',a:525600},
+    {q:'Wie schnell fliegt eine Stubenfliege in km/h?',a:7},
+    {q:'Wie viele Stufen hat der Eiffelturm bis zur Spitze?',a:1665},
+    {q:'Wie viele Länder gibt es in Afrika?',a:54},
+    {q:'Wie viel wiegt ein ausgewachsener Elefantenbulle in Kilo?',a:6000},
+    {q:'Wie lang ist die Chinesische Mauer in Kilometern?',a:21196},
+    {q:'Wie viele Tasten hat ein Klavier?',a:88},
+    {q:'Wie alt wurde der älteste je dokumentierte Mensch?',a:122},
+    {q:'Wie viele Herzen hat ein Oktopus?',a:3},
+    {q:'Wie viele Sterne hat die EU-Flagge?',a:12},
+    {q:'Wie viele Zähne hat ein Erwachsener mit Weisheitszähnen?',a:32},
+    {q:'Wie viele Knochen stecken in einem menschlichen Fuß?',a:26},
+    {q:'Wie viele Liter Blut hat ein Erwachsener?',a:5},
+    {q:'Wie weit ist der Mond von der Erde entfernt, in Kilometern?',a:384400},
+    {q:'Wie viele Sekunden braucht das Licht von der Sonne zur Erde?',a:499},
+    {q:'Wie hoch ist der Burj Khalifa in Metern?',a:828},
+    {q:'Wie viele Einwohner hat Frankfurt am Main?',a:775000},
+    {q:'Wie viele Stationen hat die Londoner U-Bahn?',a:272},
+    {q:'Wie viele Seen hat Finnland?',a:188000},
+    {q:'Wie viele Sprachen werden weltweit gesprochen?',a:7000},
+    {q:'Wie viele Muskeln hat der menschliche Körper?',a:650},
+    {q:'Wie viele Haare hat ein Mensch im Schnitt auf dem Kopf?',a:100000},
+    {q:'Wie lang ist der Äquator in Kilometern?',a:40075},
+    {q:'Wie tief ist der Bodensee an der tiefsten Stelle, in Metern?',a:251},
+    {q:'Wie hoch ist die Zugspitze in Metern?',a:2962},
+    {q:'Wie viele Kalorien stecken in einem halben Liter Pils?',a:200},
+    {q:'Wie viele Gramm wiegt ein Fußball der Größe 5?',a:430},
+    {q:'Wie viele Karten hat ein Skatblatt?',a:32},
+    {q:'Wie viele Zahlen hat ein europäischer Roulettekessel?',a:37},
+    {q:'Wie viele Halswirbel hat eine Giraffe?',a:7},
+    {q:'Wie viele Stufen führen im Kölner Dom auf den Südturm?',a:533},
+    {q:'Wie viel Prozent der Erdoberfläche sind mit Wasser bedeckt?',a:71},
+    {q:'Wie viele Zeitzonen hat Russland?',a:11},
+    {q:'Wie viele Einwohner hat der Vatikan?',a:800},
+    {q:'Wie lang ist der Eurotunnel unter dem Ärmelkanal, in Kilometern?',a:50},
+    {q:'Wie viele Passagiere passen maximal in einen Airbus A380?',a:853},
+    {q:'In welcher Höhe fliegt ein Verkehrsflugzeug, in Metern?',a:11000},
+    {q:'Wie viele Maß Bier werden auf dem Oktoberfest pro Jahr ausgeschenkt?',a:6500000},
+    {q:'Wie oft schlägt ein Kolibriherz pro Minute?',a:1200},
+    {q:'Wie viele Tage dauert eine Schwangerschaft im Schnitt?',a:280},
+    {q:'Wie viele Treppenstufen hat der Schiefe Turm von Pisa?',a:296},
+    {q:'Wie viele Knochen hat ein Neugeborenes?',a:300},
+    {q:'Wie viele Liter Luft atmet ein Mensch pro Tag?',a:12000},
+    {q:'Wie viele Kilometer Gefäße hat der menschliche Körper?',a:100000},
+    {q:'Wie viele Einwohner hat Island pro Quadratkilometer?',a:4},
+    {q:'Wie viele Jahre dauert eine Umrundung der Sonne durch den Jupiter?',a:12},
+    {q:'Wie viele Buchstaben hat das längste Wort im Duden?',a:44},
+    {q:'Wie viele Nudelsorten gibt es in Italien ungefähr?',a:350},
+    {q:'Wie viele Grad hat die Sonnenoberfläche in Celsius?',a:5500}
+  ],
+  sound:[
+    {a:'Polizeisirene',f:(c,t)=>{const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+      o.type='sawtooth';lp.type='lowpass';lp.frequency.value=1400;g.gain.value=.10;
+      for(let i=0;i<8;i++)o.frequency.setValueAtTime(i%2?920:620,t+i*.42);
+      o.connect(lp);lp.connect(g);g.connect(c.destination);o.start(t);o.stop(t+3.4);}},
+    {a:'Telefon, das klingelt',f:(c,t)=>{[440,480].forEach(fr=>{const o=c.createOscillator(),g=c.createGain();
+      o.type='sine';o.frequency.value=fr;g.gain.value=0;
+      for(let i=0;i<3;i++){const s=t+i*1.1;g.gain.setValueAtTime(.09,s);g.gain.setValueAtTime(0,s+.45);
+        g.gain.setValueAtTime(.09,s+.55);g.gain.setValueAtTime(0,s+.95);}
+      o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+3.4);});}},
+    {a:'Herzschlag',f:(c,t)=>{for(let i=0;i<5;i++){[0,.28].forEach((d,k)=>{const o=c.createOscillator(),g=c.createGain();
+      const s=t+i*.9+d;o.type='sine';o.frequency.setValueAtTime(k?55:70,s);
+      g.gain.setValueAtTime(k?.35:.5,s);g.gain.exponentialRampToValueAtTime(.001,s+.22);
+      o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+.25);});}}},
+    {a:'Regen',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,3.5);
+      const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=1100;
+      const g=c.createGain();g.gain.value=.16;s.connect(hp);hp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.5);}},
+    {a:'Motorrad',f:(c,t)=>{const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+      o.type='sawtooth';lp.type='lowpass';lp.frequency.value=700;g.gain.value=.13;
+      o.frequency.setValueAtTime(70,t);o.frequency.linearRampToValueAtTime(190,t+1.3);
+      o.frequency.linearRampToValueAtTime(85,t+1.9);o.frequency.linearRampToValueAtTime(230,t+3.2);
+      o.connect(lp);lp.connect(g);g.connect(c.destination);o.start(t);o.stop(t+3.3);}},
+    {a:'Wecker',f:(c,t)=>{for(let i=0;i<14;i++){const o=c.createOscillator(),g=c.createGain();
+      const s=t+i*.22;o.type='square';o.frequency.value=920;g.gain.setValueAtTime(.07,s);
+      g.gain.setValueAtTime(0,s+.11);o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+.12);}}},
+    {a:'Laserschuss',f:(c,t)=>{for(let i=0;i<4;i++){const o=c.createOscillator(),g=c.createGain();
+      const s=t+i*.6;o.type='sawtooth';o.frequency.setValueAtTime(1900,s);
+      o.frequency.exponentialRampToValueAtTime(110,s+.32);
+      g.gain.setValueAtTime(.14,s);g.gain.exponentialRampToValueAtTime(.001,s+.34);
+      o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+.35);}}},
+    {a:'Tropfender Wasserhahn',f:(c,t)=>{[0,.9,1.7,2.7].forEach(d=>{const o=c.createOscillator(),g=c.createGain();
+      const s=t+d;o.type='sine';o.frequency.setValueAtTime(1200,s);o.frequency.exponentialRampToValueAtTime(420,s+.09);
+      g.gain.setValueAtTime(.22,s);g.gain.exponentialRampToValueAtTime(.001,s+.14);
+      o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+.15);});}},
+    {a:'Hubschrauber',f:(c,t)=>{for(let i=0;i<44;i++){const s=c.createBufferSource();s.buffer=noise(c,.05);
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=380;
+      const g=c.createGain();const at=t+i*.075;g.gain.setValueAtTime(.5,at);
+      g.gain.exponentialRampToValueAtTime(.01,at+.05);
+      s.connect(lp);lp.connect(g);g.connect(c.destination);s.start(at);s.stop(at+.06);}}},
+    {a:'Donner',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,3);
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(160,t);
+      lp.frequency.linearRampToValueAtTime(60,t+3);
+      const g=c.createGain();g.gain.setValueAtTime(.05,t);g.gain.linearRampToValueAtTime(.9,t+.5);
+      g.gain.exponentialRampToValueAtTime(.01,t+3);
+      s.connect(lp);lp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3);}},
+    {a:'Kirchenglocke',f:(c,t)=>{[0,1.6].forEach(d=>{[420,630,1130].forEach((fr,k)=>{const o=c.createOscillator(),g=c.createGain();
+      const s=t+d;o.type='sine';o.frequency.value=fr;g.gain.setValueAtTime(.16/(k+1),s);
+      g.gain.exponentialRampToValueAtTime(.001,s+1.5);
+      o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+1.6);});});}},
+    {a:'Zug, der vorbeifährt',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,3.4);
+      const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.setValueAtTime(300,t);
+      bp.frequency.linearRampToValueAtTime(1500,t+1.7);bp.frequency.linearRampToValueAtTime(250,t+3.4);
+      const g=c.createGain();g.gain.setValueAtTime(.05,t);g.gain.linearRampToValueAtTime(.7,t+1.7);
+      g.gain.linearRampToValueAtTime(.05,t+3.4);
+      s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.4);}}
+  ]
+};
+
+/* ================= Zustand ================= */
+const state = {
+  started:false, sound:true, mode:'both', usedGames:[], usedPenalties:[],
+  teams:[
+    {name:'Team 1', players:'', pts:0},
+    {name:'Team 2', players:'', pts:0},
+    {name:'Team 3', players:'', pts:0}
+  ],
+  games:[
+    {n:'Würfeln', r:'Beide Teams würfeln mit je zwei Würfeln. Die höhere Team-Summe gewinnt.'},
+    {n:'Klau-Runde', r:'Jeder aus dem Team muss etwas mitgehen lassen. Nichts darf doppelt sein. Der Schiri zählt und bewertet.'},
+    {n:'Tisch-Steher', r:'Beide stellen sich vor einen fremden Tisch. Wer länger dasteht, ohne angesprochen zu werden, gewinnt.'},
+    {n:'Münzen schnorren', r:'Beide Teams fragen Leute nach Kleingeld. Nach der Zeit gewinnt, wer mehr gesammelt hat.'},
+    {n:'Karaoke', r:'Beide Teams singen. Der Schiri entscheidet, wo mehr Stimmung war.'},
+    {n:'Wettrennen', r:'Vor der Bar auf eine Strecke einigen. Erstes Team im Ziel gewinnt.'},
+    {n:'Buffalo', r:'Wer mit der falschen Hand trinkt, verliert. Gilt bis zum Ende der Runde.'},
+    {n:'Kleiner Zwerg', r:'Der kleine Zwerg auf dem Bier. Wer den Text verhaut oder die falsche Bewegung macht, trinkt.'},
+    {n:'Kategorien', r:'Der Schiri gibt ein Thema vor. Wer nichts mehr weiß oder zu lange braucht, ist raus. Best of 3.'},
+    {n:'Bierdeckel flippen', r:'Bierdeckel an der Tischkante hochschnippen und fangen. Wer mehr schafft, gewinnt.'},
+    {n:'Münze drehen', r:'Münze auf dem Tisch andrehen. Wessen Münze länger dreht, gewinnt.'},
+    {n:'Münze ins Glas', r:'Münze über den Tisch ins Glas schnipsen. Wer zuerst trifft, gewinnt.'},
+    {n:'Split the G', r:'Ein Zug, der Schaum muss genau im G stehen. Der Schiri legt den Buchstaben fest.'},
+    {n:'Quiz', r:'Der Schiri denkt sich ein Thema aus und stellt fünf Fragen. Mehr richtige Antworten gewinnen.'},
+    {n:'Reihen-Exen', r:'Beide Teams treten gleichzeitig an. Erst trinkt einer sein Getränk komplett aus, erst dann darf der Partner anfangen. Welches Team zuerst beide Gläser leer hat, gewinnt. Der Schiri prüft, ob wirklich nichts mehr drin ist.'},
+    {n:'Der stille Auftrag', r:'Der Schiri gibt jedem Team heimlich eine Aufgabe, die in der nächsten halben Stunde unauffällig erledigt werden muss, zum Beispiel ein bestimmtes Wort dreimal in ein Gespräch mit Fremden einbauen. Wer es schafft, ohne dass die Gegner es merken, gewinnt. Auflösung beim Schiri.'},
+    {n:'Bild wird schärfer', type:'blur', r:'Ein Bild startet komplett verschwommen und wird über 10 Sekunden scharf. Wer zuerst ruft, was es ist, bekommt den Punkt. Der Schiri tippt drauf. 5 Runden.'},
+    {n:'Flaggen raten', type:'flag', r:'Eine Flagge erscheint. Wer zuerst das Land ruft, bekommt den Punkt. Der Schiri entscheidet und tippt. 5 Runden.'},
+    {n:'Stadt in 3 Hinweisen', type:'clue', r:'Der Schiri liest die Hinweise nacheinander vor. Wer die Stadt zuerst nennt, bekommt den Punkt. 5 Runden.'},
+    {n:'Geräusch raten', type:'sound', r:'Der Schiri spielt ein Geräusch ab. Wer zuerst weiß, was das ist, bekommt den Punkt. Handy laut stellen. 5 Runden.'},
+    {n:'Schätzfrage', type:'guess', r:'Beide Teams tippen eine Zahl ins Handy. Wer näher dran ist, bekommt den Punkt. 5 Runden.'},
+    {n:'Reaktionsduell', type:'react', r:'Handy zwischen die beiden Teams legen, jedes Team hat eine Hälfte. Getippt wird nur, wenn die ganze Fläche grün wird. Es kommen aber Fallen: falsche Farben, ein grüner Kreis, das Wort GRÜN auf Rot, ein abgebrochener Countdown. Wer bei einer Falle tippt, verliert die Runde sofort. 5 Runden.'},
+    {n:'Höher oder tiefer', type:'high', r:'Zwei Sachen stehen gegeneinander. Beide Teams tippen ihren Favoriten an, danach wird aufgelöst. Beide richtig heißt Punkt für beide. 5 Runden.'},
+    {n:'Emoji-Rätsel', type:'emoji', r:'Drei Emojis beschreiben einen Begriff. Wer ihn zuerst nennt, bekommt den Punkt. Der Schiri tippt drauf. 5 Runden.'}
+  ],
+  penalties:[
+    'Die Gegner eine Bar lang wie Götter behandeln',
+    'Ohne Schuhe in die nächste Bar',
+    'Runde billigste Shots für alle zahlen',
+    'Auf einen Baum klettern, höher als der Kleinste der Gruppe',
+    'Eine Bar lang die Schuhe mit dem Teampartner tauschen',
+    'Die Eintracht-Frankfurt-Hymne in der Bar singen',
+    'Mama auf Lautsprecher anrufen, sagen dass es dir gut geht, danach eine Minute schweigen',
+    'Hände zusammenkleben lassen',
+    '10 Minuten kein Wort sagen',
+    'Eine Bar lang nur in der dritten Person über sich reden',
+    'Den nächsten Drink bestimmen die Gegner, ohne Diskussion trinken',
+    'Eine Bar lang Kellnerdienst: jede Bestellung für die Gruppe holen und bringen'
+  ],
+  bonuses:[
+    'Runde Shots bezahlt','Letztes Team, das etwas Alkoholfreies trinkt',
+    'Letztes Team, das etwas isst','Gratis Drink oder Shot abgestaubt','Gekotzt – mit Beweis'
+  ],
+  logs:[],
+  cur:{game:null,a:null,b:null,ref:null,first:null,winner:null,loser:null,pen:null,bonusIdx:null}
+};
+
+const PALETTE=['#FF3D7F','#2BD9C4','#FFD23F','#9B6BFF','#FF8A3D','#4ED9FF'];
+const TEAMCLASS=['t0','t1','t2'];
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>a.slice().sort(()=>Math.random()-.5);
+function esc(s){return String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= Dialoge ================= */
+function closeModal(){ document.getElementById('modal').classList.remove('on'); }
+function ask(text,onYes,yesLabel){
+  document.getElementById('modalText').textContent=text;
+  document.getElementById('modalBtns').innerHTML=
+    `<button class="btn ghost" id="mNo">Abbrechen</button><button class="btn" id="mYes">${esc(yesLabel||'Ja')}</button>`;
+  document.getElementById('mNo').onclick=closeModal;
+  document.getElementById('mYes').onclick=()=>{ closeModal(); if(onYes) onYes(); };
+  document.getElementById('modal').classList.add('on');
+}
+function note(text,onOk){
+  document.getElementById('modalText').textContent=text;
+  document.getElementById('modalBtns').innerHTML=`<button class="btn" id="mYes">Alles klar</button>`;
+  document.getElementById('mYes').onclick=()=>{ closeModal(); if(onOk) onOk(); };
+  document.getElementById('modal').classList.add('on');
+}
+
+/* ================= Ton & Konfetti ================= */
+let actx=null;
+function ac(force){
+  if(!state.sound && !force) return null;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended') actx.resume();
+    return actx;
+  }catch(e){ return null; }
+}
+function noise(ctx,dur){
+  const n=Math.floor(ctx.sampleRate*dur), b=ctx.createBuffer(1,n,ctx.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+  return b;
+}
+function drumHit(ctx,at,vol){
+  const s=ctx.createBufferSource();s.buffer=noise(ctx,.06);
+  const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=190;f.Q.value=1.2;
+  const g=ctx.createGain();g.gain.setValueAtTime(vol,at);g.gain.exponentialRampToValueAtTime(.001,at+.06);
+  s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(at);s.stop(at+.07);
+}
+function playDrumroll(ms){
+  const ctx=ac(); if(!ctx) return;
+  const t0=ctx.currentTime, total=ms/1000;
+  for(let t=0;t<total;t+=.048) drumHit(ctx,t0+t,.12+.32*(t/total));
+}
+function playCrash(){
+  const ctx=ac(); if(!ctx) return;
+  const t=ctx.currentTime, s=ctx.createBufferSource();
+  s.buffer=noise(ctx,1.4);
+  const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=2800;
+  const g=ctx.createGain();g.gain.setValueAtTime(.45,t);g.gain.exponentialRampToValueAtTime(.001,t+1.4);
+  s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(t);s.stop(t+1.4);
+}
+function confetti(){
+  const box=document.createElement('div');box.className='confetti';
+  for(let i=0;i<46;i++){
+    const p=document.createElement('i');
+    p.style.left=Math.random()*100+'%';
+    p.style.background=PALETTE[rnd(PALETTE.length)];
+    p.style.animationDuration=(1.3+Math.random()*1.5)+'s';
+    p.style.animationDelay=(Math.random()*.35)+'s';
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(()=>box.remove(),3400);
+}
+function toggleSound(){
+  state.sound=!state.sound;
+  document.getElementById('soundBtn').textContent=state.sound?'Ton an':'Ton aus';
+  persist();
+}
+
+/* ================= Setup & Anzeige ================= */
+function renderSetup(){
+  document.getElementById('setupTeams').innerHTML=state.teams.map((t,i)=>`
+    <div class="setupteam">
+      <label for="tn${i}">Teamname ${i+1}</label>
+      <input id="tn${i}" value="${esc(t.name)}" maxlength="18">
+      <label for="tp${i}">Die zwei Namen</label>
+      <input id="tp${i}" value="${esc(t.players)}" placeholder="Ferdi & Max" maxlength="30">
+    </div>`).join('');
+}
+function startNight(){
+  state.teams.forEach((t,i)=>{
+    const n=document.getElementById('tn'+i).value.trim();
+    t.players=document.getElementById('tp'+i).value.trim();
+    if(n) t.name=n;
+  });
+  state.started=true; renderAll(); show('s-hub');
+}
+function renderBoard(){
+  const max=Math.max(...state.teams.map(t=>t.pts));
+  document.getElementById('board').innerHTML=state.teams.map((t,i)=>`
+    <div class="tcard ${TEAMCLASS[i]} ${t.pts===max&&max>0?'lead':''}">
+      <div class="bar"></div>${t.pts===max&&max>0?'<div class="crown">👑</div>':''}
+      <div class="tname">${esc(t.name)}</div>
+      <div class="tplay">${esc(t.players||'—')}</div>
+      <div class="tpts">${t.pts}</div>
+    </div>`).join('');
+}
+function renderLog(){
+  const el=document.getElementById('log');
+  el.innerHTML=state.logs.length?state.logs.slice(0,12).map(l=>`<div>${l}</div>`).join(''):'<div>Noch nichts passiert.</div>';
+}
+function renderAll(){
+  renderBoard(); renderLog();
+  const rb=document.getElementById('resumeBtn');
+  if(rb) rb.style.display=state.cur.game?'block':'none';
+  const sb=document.getElementById('soundBtn');
+  if(sb) sb.textContent=state.sound?'Ton an':'Ton aus';
+  renderMode();
+  persist();
+}
+function addLog(txt){ state.logs.unshift(esc(txt)); }
+
+/* ================= Glücksrad ================= */
+function wrapLabel(t,per,maxLines){
+  const words=String(t).split(/\s+/), lines=[]; let cur='';
+  words.forEach(w=>{
+    if(!cur) cur=w;
+    else if((cur+' '+w).length<=per) cur+=' '+w;
+    else { lines.push(cur); cur=w; }
+  });
+  if(cur) lines.push(cur);
+  const out=lines.slice(0,maxLines).map(l=>l.length>per?l.slice(0,per-1)+'…':l);
+  if(lines.length>maxLines) out[maxLines-1]=out[maxLines-1].replace(/.$/,'')+'…';
+  return out;
+}
+function drawWheel(canvasId,items){
+  const c=document.getElementById(canvasId);
+  const dpr=window.devicePixelRatio||1, size=c.clientWidth||300;
+  c.width=size*dpr; c.height=size*dpr;
+  const ctx=c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,size,size);
+  const cx=size/2, cy=size/2, r=size/2-1, n=items.length, seg=2*Math.PI/n;
+  const fs=Math.max(8,Math.min(12,size/26)), lh=fs+1;
+  const per=n>16?14:18;
+  for(let i=0;i<n;i++){
+    const a0=-Math.PI/2+i*seg;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a0,a0+seg);ctx.closePath();
+    ctx.fillStyle=PALETTE[i%PALETTE.length];ctx.fill();
+    ctx.strokeStyle='rgba(27,16,53,.6)';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(a0+seg/2);
+    ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#1B1035';
+    ctx.font=`800 ${fs}px Outfit, sans-serif`;
+    const lines=wrapLabel(items[i],per,2);
+    lines.forEach((ln,j)=>ctx.fillText(ln, r-12, (j-(lines.length-1)/2)*lh));
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,r*.15,0,2*Math.PI);
+  ctx.fillStyle='#1B1035';ctx.fill();ctx.strokeStyle='#FFD23F';ctx.lineWidth=3;ctx.stroke();
+}
+const rotAcc={gameRot:0,penRot:0};
+function spinWheel(rotId,n,cb){
+  const el=document.getElementById(rotId), idx=rnd(n), seg=360/n;
+  const target=(360-(idx*seg+seg/2)+360)%360;
+  const current=((rotAcc[rotId]%360)+360)%360;
+  rotAcc[rotId]+=((target-current+360)%360)+360*6;
+  el.style.transition='transform 4.6s cubic-bezier(.15,.72,.16,1)';
+  el.style.transform=`rotate(${rotAcc[rotId]}deg)`;
+  setTimeout(()=>cb(idx),4750);
+}
+
+/* ================= Pools ================= */
+function unusedGames(){ return state.games.filter(g=>!state.usedGames.includes(g.n)); }
+function openGames(){
+  return unusedGames().filter(g=>{
+    if(state.mode==='bar') return !g.type;
+    if(state.mode==='phone') return !!g.type;
+    return true;
+  });
+}
+function openPens(){ return state.penalties.filter(p=>!state.usedPenalties.includes(p)); }
+
+const MODE_LABEL={bar:'Bar-Spiele',phone:'Handy-Spiele',both:'Bar und Handy'};
+function setMode(m){
+  state.mode=m; renderMode(); persist();
+}
+function renderMode(){
+  document.querySelectorAll('#modeRow .btn').forEach(b=>
+    b.classList.toggle('act', b.dataset.m===state.mode));
+}
+
+function openGameWheel(){
+  if(openGames().length===0){
+    if(unusedGames().length){
+      note('In dieser Kategorie ist gerade nichts mehr offen. Stell oben auf „Beides" um oder gib die Spiele unter Verwalten wieder frei.');
+      return;
+    }
+    ask('Alle Spiele sind einmal durch. Nochmal alle freigeben?',()=>{
+      state.usedGames=[]; openGameWheel();
+    },'Freigeben');
+    return;
+  }
+  show('s-gamewheel');
+  const pool=openGames();
+  document.getElementById('gamesLeft').textContent=
+    `${MODE_LABEL[state.mode]} · ${pool.length===1?'letztes offenes Spiel':pool.length+' noch offen'}`;
+  setTimeout(()=>drawWheel('gameCanvas',pool.map(g=>g.n)),60);
+  const b=document.getElementById('spinGameBtn'); b.disabled=false; b.textContent='Rad drehen';
+}
+function spinGame(){
+  const b=document.getElementById('spinGameBtn'); b.disabled=true; b.textContent='Dreht…';
+  const pool=openGames();
+  spinWheel('gameRot',pool.length,idx=>{ state.cur.game=pool[idx]; drawTeams(); });
+}
+
+/* ================= Auslosung ================= */
+function drawTeams(){
+  const order=shuffle([0,1,2]);
+  state.cur.a=order[0]; state.cur.b=order[1]; state.cur.ref=order[2];
+  state.cur.first=Math.random()<.5?order[0]:order[1];
+  const t=state.teams, g=state.cur.game;
+  document.getElementById('drawGame').textContent=g.n;
+  document.getElementById('duel').innerHTML=`
+    <div class="slot p${state.cur.a}"><b>${esc(t[state.cur.a].name)}</b><span>${esc(t[state.cur.a].players||'')}</span></div>
+    <div class="vs">vs</div>
+    <div class="slot p${state.cur.b}"><b>${esc(t[state.cur.b].name)}</b><span>${esc(t[state.cur.b].players||'')}</span></div>`;
+  document.getElementById('refLine').innerHTML=`Schiri: <b>${esc(t[state.cur.ref].name)}</b> — entscheidet bei Streit, keine Diskussion`;
+  document.getElementById('firstLine').textContent=`${t[state.cur.first].name} fängt an`;
+  document.getElementById('rulesTitle').innerHTML=esc(g.n)+(g.type?'<span class="tag">Am Handy</span>':'');
+  document.getElementById('rulesText').textContent=g.r;
+  document.getElementById('rulesMatch').textContent=`${t[state.cur.a].name} vs ${t[state.cur.b].name} · Schiri: ${t[state.cur.ref].name}`;
+  const go=document.getElementById('rulesGo');
+  if(g.type){ go.textContent='Spiel starten'; go.onclick=startDigital; }
+  else { go.textContent='Spiel ist durch'; go.onclick=openWinner; }
+  persist();
+  show('s-draw');
+}
+
+/* ================= Handy-Spiele ================= */
+const play={type:null,idx:0,items:[],a:0,b:0};
+function startDigital(){
+  const g=state.cur.game;
+  play.type=g.type; play.idx=0; play.a=0; play.b=0; play.ready=false; play.revealed=false;
+  play.items=shuffle(CONTENT[g.type]).slice(0,5);
+  document.getElementById('playTitle').textContent=g.n;
+  show('s-play'); renderPlay();
+}
+function scoreBtns(){
+  const t=state.teams;
+  return `<p class="eyebrow">Wer hatte es zuerst richtig?</p>
+    <div class="row">
+      <button class="btn pink" onclick="award('a')">${esc(t[state.cur.a].name)}</button>
+      <button class="btn teal" onclick="award('b')">${esc(t[state.cur.b].name)}</button>
+    </div>
+    <button class="btn ghost sm" onclick="award(null)">Keiner wusste es</button>`;
+}
+function renderPlay(){
+  const t=state.teams, it=play.items[play.idx];
+  document.getElementById('playScore').innerHTML=
+    `<span><b>${esc(t[state.cur.a].name)}</b> ${play.a}</span>
+     <span>Runde ${play.idx+1}/${play.items.length}</span>
+     <span>${play.b} <b>${esc(t[state.cur.b].name)}</b></span>`;
+  const stage=document.getElementById('playStage'), ctrl=document.getElementById('playControls');
+
+  const NEEDS_REF=['blur','flag','emoji','clue','sound'];
+  if(NEEDS_REF.includes(play.type) && !play.ready){
+    stage.innerHTML=`<p class="eyebrow">Nur für ${esc(t[state.cur.ref].name)}</p>
+      <div class="answer">${esc(it.a)}</div>
+      <p class="eyebrow">Handy so halten, dass die anderen nichts sehen. Danach flach auf den Tisch legen.</p>`;
+    ctrl.innerHTML=`<button class="btn" onclick="play.ready=true;renderPlay()">Lösung gemerkt, Runde starten</button>`;
+    return;
+  }
+
+  if(play.type==='blur'){
+    stage.innerHTML=`<div class="bigemoji blurring">${it.e}</div><p class="eyebrow">Wird 10 Sekunden lang schärfer</p>`;
+    ctrl.innerHTML=`<button class="btn ghost sm" onclick="reveal()">Auflösen</button>`+scoreBtns();
+  }
+  if(play.type==='flag'){
+    stage.innerHTML=`<div class="bigemoji">${it.e}</div><p class="eyebrow">Welches Land?</p>`;
+    ctrl.innerHTML=`<button class="btn ghost sm" onclick="reveal()">Auflösen</button>`+scoreBtns();
+  }
+  if(play.type==='clue'){
+    stage.innerHTML=`<div class="clue">1. ${esc(it.c[0])}</div><div id="clueRest"></div>`;
+    ctrl.innerHTML=`<button class="btn sm" id="clueBtn" onclick="nextClue()">Nächster Hinweis</button>
+      <button class="btn ghost sm" onclick="reveal()">Auflösen</button>`+scoreBtns();
+    play.clue=1;
+  }
+  if(play.type==='sound'){
+    stage.innerHTML=`<div class="bigemoji">🔊</div><p class="eyebrow">Was ist das für ein Geräusch?</p>`;
+    ctrl.innerHTML=`<button class="btn sm" onclick="playItemSound()">Geräusch abspielen</button>
+      <button class="btn ghost sm" onclick="reveal()">Auflösen</button>`+scoreBtns();
+  }
+  if(play.type==='emoji'){
+    stage.innerHTML=`<div class="bigemoji" style="font-size:clamp(46px,15vw,70px)">${it.e}</div><p class="eyebrow">Welcher Begriff?</p>`;
+    ctrl.innerHTML=`<button class="btn ghost sm" onclick="reveal()">Auflösen</button>`+scoreBtns();
+  }
+  if(play.type==='high'){
+    play.pick={a:null,b:null};
+    stage.innerHTML=`<p style="font-size:17px;font-weight:800;margin:0">${esc(it.q)}</p><div id="hlPick" style="width:100%"></div>`;
+    ctrl.innerHTML=`<button class="btn" id="hlSolve" onclick="solveHigh()">Auflösen</button>`;
+    renderHigh();
+  }
+  if(play.type==='react'){
+    stage.innerHTML=`<div id="reactBox" class="reactbox">
+        <div class="reactzone" id="rzA" onclick="reactTap('a')"><span>${esc(t[state.cur.a].name)}</span></div>
+        <div class="reactzone" id="rzB" onclick="reactTap('b')"><span>${esc(t[state.cur.b].name)}</span></div>
+        <div class="reactmsg" id="reactMsg">Achtung…</div>
+      </div>`;
+    ctrl.innerHTML=`<p class="eyebrow">Nur tippen, wenn die ganze Fläche grün ist. Alles andere ist eine Falle. Es kann dauern.</p>
+      <button class="btn ghost sm" onclick="startReact()">Runde neu starten</button>`;
+    startReact();
+  }
+  if(play.type==='guess'){
+    stage.innerHTML=`<p style="font-size:17px;font-weight:800;margin:0">${esc(it.q)}</p>
+      <div class="guessrow"><label for="gA">${esc(t[state.cur.a].name)}</label><input id="gA" type="number" inputmode="numeric"></div>
+      <div class="guessrow"><label for="gB">${esc(t[state.cur.b].name)}</label><input id="gB" type="number" inputmode="numeric"></div>`;
+    ctrl.innerHTML=`<button class="btn" onclick="resolveGuess()">Auflösen und Punkt vergeben</button>`;
+  }
+}
+/* --- Höher oder tiefer --- */
+function renderHigh(){
+  const it=play.items[play.idx], t=state.teams;
+  const btn=(k,side,c)=>{
+    const sel=play.pick[k]===side;
+    return `<button class="btn ${sel?c:'ghost'} sm" onclick="pickHigh('${k}','${side}')">${esc(it[side].t)}</button>`;
+  };
+  document.getElementById('hlPick').innerHTML=
+    `<p class="eyebrow" style="margin:12px 0 4px">${esc(t[state.cur.a].name)}</p>
+     <div class="row">${btn('a','l','pink')}${btn('a','r','pink')}</div>
+     <p class="eyebrow" style="margin:10px 0 4px">${esc(t[state.cur.b].name)}</p>
+     <div class="row">${btn('b','l','teal')}${btn('b','r','teal')}</div>`;
+}
+function pickHigh(k,side){ play.pick[k]=side; renderHigh(); }
+function solveHigh(){
+  const it=play.items[play.idx];
+  if(!play.pick.a||!play.pick.b){ note('Beide Teams müssen erst tippen.'); return; }
+  const ra=play.pick.a===it.w, rb=play.pick.b===it.w;
+  const d=document.createElement('div'); d.className='answer';
+  d.innerHTML=`${esc(it[it.w].t)}<br><span style="font-size:13px;color:var(--muted);font-family:Outfit">${esc(it.l.t)}: ${esc(it.l.v)} · ${esc(it.r.t)}: ${esc(it.r.v)}</span>`;
+  document.getElementById('playStage').appendChild(d);
+  const w = (ra&&rb) ? "'both'" : ra ? "'a'" : rb ? "'b'" : "null";
+  const txt = (ra&&rb) ? 'Beide richtig, Punkt für beide' : (!ra&&!rb) ? 'Beide daneben, kein Punkt' : 'Punkt vergeben';
+  document.getElementById('playControls').innerHTML=
+    `<p class="eyebrow">${txt}</p><button class="btn" onclick="award(${w})">Weiter</button>`;
+}
+
+/* --- Reaktionsduell --- */
+const FAKES=[
+  {c:'red',m:'ROT'},{c:'yellow',m:'GELB'},{c:'blue',m:'BLAU'},
+  {c:'red',m:'GRÜN'},{c:'neutral',m:'🟢'},{c:'neutral',m:'⚡'},
+  {c:'neutral',m:'3 … 2 … 1 …'},{c:'yellow',m:'FAST'},{c:'blue',m:'JETZT?'}
+];
+function setBox(kind,msg){
+  const box=document.getElementById('reactBox'); if(!box) return;
+  box.className='reactbox'+(kind!=='neutral'?' '+kind:'');
+  const m=document.getElementById('reactMsg'); if(m) m.textContent=msg;
+}
+function clearReact(){
+  if(play.react&&play.react.timers) play.react.timers.forEach(clearTimeout);
+}
+function startReact(){
+  clearReact();
+  play.react={phase:'wait',done:false,timers:[],goAt:0};
+  const r=play.react;
+  setBox('neutral','Achtung…');
+  let t=1600+rnd(2200);
+  const fakes=1+rnd(4);
+  for(let i=0;i<fakes;i++){
+    const f=FAKES[rnd(FAKES.length)], at=t;
+    r.timers.push(setTimeout(()=>{ if(r.done) return; r.phase='fake'; setBox(f.c,f.m); },at));
+    r.timers.push(setTimeout(()=>{ if(r.done) return; r.phase='wait'; setBox('neutral','…'); },at+850));
+    t=at+850+900+rnd(1900);
+  }
+  r.timers.push(setTimeout(()=>{
+    if(r.done) return;
+    r.phase='go'; r.goAt=Date.now(); setBox('go','JETZT!');
+  }, t+1200+rnd(2800)));
+}
+function nameOf(k){ return state.teams[k==='a'?state.cur.a:state.cur.b].name; }
+function reactTap(k){
+  const r=play.react;
+  if(!r||r.done) return;
+  r.done=true; clearReact();
+  if(r.phase==='go'){
+    const ms=Date.now()-r.goAt;
+    setBox('go',`${nameOf(k)}\n${ms} ms`);
+    endReact(k,`${nameOf(k)} war schneller: ${ms} Millisekunden`);
+  }else{
+    setBox('red','Zu früh!');
+    endReact(k==='a'?'b':'a',`${nameOf(k)} ist in die Falle getappt`);
+  }
+}
+function endReact(winner,msg){
+  document.getElementById('playControls').innerHTML=
+    `<p class="eyebrow">${esc(msg)}</p><button class="btn" onclick="award('${winner}')">Weiter</button>`;
+}
+
+function nextClue(){
+  const it=play.items[play.idx];
+  if(play.clue>=it.c.length) return;
+  const d=document.createElement('div');
+  d.className='clue'; d.textContent=(play.clue+1)+'. '+it.c[play.clue];
+  document.getElementById('clueRest').appendChild(d);
+  play.clue++;
+  if(play.clue>=it.c.length) document.getElementById('clueBtn').disabled=true;
+}
+function reveal(){
+  if(play.revealed) return;
+  play.revealed=true;
+  const it=play.items[play.idx];
+  const d=document.createElement('div'); d.className='answer'; d.textContent=it.a;
+  document.getElementById('playStage').appendChild(d);
+}
+function playItemSound(){
+  const ctx=ac(true);
+  if(!ctx){ note('Der Browser lässt gerade keinen Ton zu.'); return; }
+  play.items[play.idx].f(ctx,ctx.currentTime+.05);
+}
+function resolveGuess(){
+  const it=play.items[play.idx], t=state.teams;
+  const va=parseFloat(document.getElementById('gA').value);
+  const vb=parseFloat(document.getElementById('gB').value);
+  if(isNaN(va)||isNaN(vb)){ note('Beide Teams müssen erst eine Zahl eintragen.'); return; }
+  const da=Math.abs(va-it.a), db=Math.abs(vb-it.a);
+  const w = da<db ? "'a'" : db<da ? "'b'" : "'both'";
+  const txt = da<db ? `${t[state.cur.a].name} war näher dran`
+            : db<da ? `${t[state.cur.b].name} war näher dran`
+            : 'Exakt gleich weit daneben, Punkt für beide';
+  const num=n=>n.toLocaleString('de-DE');
+  document.getElementById('playStage').innerHTML=
+    `<p class="eyebrow" style="margin:0">${esc(it.q)}</p>
+     <p class="eyebrow" style="margin:0">Richtige Antwort</p>
+     <div class="answer" style="margin:0">${num(it.a)}</div>
+     <div style="width:100%">
+       <div class="clue">${esc(t[state.cur.a].name)}: ${num(va)} · ${num(da)} daneben</div>
+       <div class="clue" style="margin-top:6px">${esc(t[state.cur.b].name)}: ${num(vb)} · ${num(db)} daneben</div>
+     </div>`;
+  document.getElementById('playControls').innerHTML=
+    `<p class="eyebrow">${esc(txt)}</p><button class="btn" onclick="award(${w})">Weiter</button>`;
+}
+function award(w){
+  clearReact();
+  if(w==='a') play.a++;
+  if(w==='b') play.b++;
+  if(w==='both'){ play.a++; play.b++; }
+  play.idx++;
+  play.ready=false; play.revealed=false;
+  if(play.idx<play.items.length){ renderPlay(); return; }
+  if(play.a===play.b){
+    const pool=CONTENT[play.type].filter(x=>!play.items.includes(x));
+    if(pool.length){
+      play.items.push(pool[rnd(pool.length)]);
+      renderPlay();
+      note('Unentschieden – es gibt eine Stechrunde.');
+      return;
+    }
+  }
+  const t=state.teams;
+  const winner = play.a>play.b ? state.cur.a : (play.b>play.a ? state.cur.b : null);
+  if(winner===null){ openWinner(); return; }
+  addLog(`${t[winner].name} gewinnt ${state.cur.game.n} mit ${Math.max(play.a,play.b)}:${Math.min(play.a,play.b)}`);
+  setWinner(winner);
+}
+
+/* ================= Sieger, Punkte, Trommelwirbel ================= */
+function openWinner(){
+  const t=state.teams;
+  document.getElementById('winnerGame').textContent=state.cur.game.n;
+  document.getElementById('winnerBtns').innerHTML=
+    `<button class="btn pink" onclick="setWinner(${state.cur.a})">${esc(t[state.cur.a].name)}</button>
+     <button class="btn teal" onclick="setWinner(${state.cur.b})">${esc(t[state.cur.b].name)}</button>`;
+  show('s-winner');
+}
+/* Nur in rund 13% der Fälle gibt es überhaupt einen Multiplikator. */
+function rollMultiplier(){
+  if(Math.random()>0.13) return 1;
+  const r=Math.random();
+  if(r<.55) return 2;
+  if(r<.85) return 3;
+  return 5;
+}
+const MULTI_LABEL={2:'Doppelte Punkte!',3:'Dreifach!',5:'Fünffach! Wahnsinn!'};
+function replay(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; }
+function runDrumroll(m,done){
+  const mt=document.getElementById('multiText'),
+        hint=document.getElementById('drumHint'),
+        panel=document.getElementById('scorePanel');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  hint.textContent='Moment mal…';
+  if(reduced){ mt.textContent='×'+m; hint.textContent=MULTI_LABEL[m]; playCrash(); done(); return; }
+  panel.classList.add('shake');
+  const dur=2600; playDrumroll(dur);
+  const faces=['×2','×3','×5'];
+  let el=0, delay=55;
+  (function tick(){
+    mt.textContent=faces[rnd(faces.length)];
+    el+=delay; delay=55+Math.pow(el/dur,3)*300;
+    if(el<dur){ setTimeout(tick,delay); return; }
+    mt.textContent='×'+m; hint.textContent=MULTI_LABEL[m];
+    panel.classList.remove('shake');
+    mt.classList.add('slam'); replay(mt);
+    playCrash(); confetti();
+    setTimeout(done,400);
+  })();
+}
+function setWinner(i){
+  state.cur.winner=i;
+  state.cur.loser=(i===state.cur.a)?state.cur.b:state.cur.a;
+  const m=rollMultiplier(), base=3, pts=base*m;
+  state.teams[i].pts+=pts;
+  document.getElementById('scoreTeam').textContent=`${state.teams[i].name} gewinnt ${state.cur.game.n}`;
+  document.getElementById('punishLoser').textContent=`${state.teams[state.cur.loser].name} hat verloren`;
+  addLog(`${state.teams[i].name}: +${pts} Punkte${m>1?` (×${m})`:''}`);
+  renderAll();
+  const pt=document.getElementById('ptsText'), mt=document.getElementById('multiText'),
+        hint=document.getElementById('drumHint'), tot=document.getElementById('scoreTotal'),
+        next=document.getElementById('scoreNext');
+  mt.textContent=''; mt.classList.remove('slam'); hint.textContent='';
+  pt.textContent='+'+base; replay(pt);
+  if(m===1){
+    tot.textContent=`Neuer Stand: ${state.teams[i].pts} Punkte`;
+    next.style.display='block'; show('s-score'); return;
+  }
+  tot.textContent=''; next.style.display='none';
+  show('s-score');
+  setTimeout(()=>runDrumroll(m,()=>{
+    pt.textContent='+'+pts; replay(pt);
+    tot.textContent=`Neuer Stand: ${state.teams[i].pts} Punkte`;
+    next.style.display='block';
+  }),950);
+}
+
+/* ================= Bestrafung ================= */
+function chooseShot(){
+  addLog(`${state.teams[state.cur.loser].name} kippt einen Shot`);
+  if(state.cur.game) state.usedGames.push(state.cur.game.n);
+  state.cur.game=null;
+  renderAll(); show('s-hub');
+}
+function openPenaltyWheel(){
+  if(openPens().length===0){
+    ask('Alle Strafen waren schon dran. Nochmal alle freigeben?',()=>{
+      state.usedPenalties=[]; openPenaltyWheel();
+    },'Freigeben');
+    return;
+  }
+  show('s-penwheel');
+  const pool=openPens();
+  document.getElementById('pensLeft').textContent=pool.length===1?'Letzte offene Strafe':`${pool.length} Strafen noch offen`;
+  setTimeout(()=>drawWheel('penCanvas',pool),60);
+  const b=document.getElementById('spinPenBtn'); b.disabled=false; b.textContent='Rad drehen';
+}
+function spinPenalty(){
+  const b=document.getElementById('spinPenBtn'); b.disabled=true; b.textContent='Dreht…';
+  const pool=openPens();
+  spinWheel('penRot',pool.length,idx=>{
+    const p=pool[idx];
+    document.getElementById('penTeam').textContent=`Strafe für ${state.teams[state.cur.loser].name}`;
+    document.getElementById('penText').textContent=p;
+    state.cur.pen=p;
+    show('s-penresult');
+  });
+}
+function finishRound(){
+  addLog(`Strafe für ${state.teams[state.cur.loser].name}: ${state.cur.pen}`);
+  if(state.cur.game) state.usedGames.push(state.cur.game.n);
+  if(state.cur.pen) state.usedPenalties.push(state.cur.pen);
+  state.cur.game=null; state.cur.pen=null;
+  renderAll(); show('s-hub');
+}
+
+/* ================= Bonus ================= */
+function renderBonus(){
+  document.getElementById('bonusList').innerHTML=state.bonuses.map((b,i)=>
+    `<button class="item tap" onclick="pickBonus(${i})">${esc(b)}<span>›</span></button>`).join('');
+}
+function pickBonus(i){
+  state.cur.bonusIdx=i;
+  document.getElementById('bonusChosen').textContent=state.bonuses[i];
+  document.getElementById('bonusTeamBtns').innerHTML=state.teams.map((t,j)=>
+    `<button class="btn ${['pink','teal',''][j]}" onclick="giveBonus(${j})">${esc(t.name)}</button>`).join('');
+  show('s-bonusteam');
+}
+function giveBonus(j){
+  const pts=1+rnd(3);
+  state.teams[j].pts+=pts;
+  const name=state.bonuses[state.cur.bonusIdx];
+  document.getElementById('bonusRevealTeam').textContent=state.teams[j].name;
+  document.getElementById('bonusPts').textContent='+'+pts;
+  document.getElementById('bonusRevealName').textContent=`${name} · neuer Stand: ${state.teams[j].pts}`;
+  addLog(`Bonus für ${state.teams[j].name}: ${name} (+${pts})`);
+  renderAll();
+  replay(document.getElementById('bonusPts'));
+  show('s-bonusreveal');
+}
+
+/* ================= Verwalten ================= */
+function addGame(){
+  const n=document.getElementById('ngName').value.trim();
+  const r=document.getElementById('ngRule').value.trim();
+  if(!n){document.getElementById('ngName').focus();return;}
+  state.games.push({n,r:r||'Der Schiri legt die Regeln fest.'});
+  document.getElementById('ngName').value=''; document.getElementById('ngRule').value='';
+  renderManage();
+}
+function addPenalty(){
+  const n=document.getElementById('npName').value.trim();
+  if(!n){document.getElementById('npName').focus();return;}
+  state.penalties.push(n); document.getElementById('npName').value=''; renderManage();
+}
+function addBonus(){
+  const n=document.getElementById('nbName').value.trim();
+  if(!n){document.getElementById('nbName').focus();return;}
+  state.bonuses.push(n); document.getElementById('nbName').value=''; renderManage();
+}
+function del(kind,i){
+  if(kind==='g'&&state.games.length>2) state.games.splice(i,1);
+  if(kind==='p'&&state.penalties.length>2) state.penalties.splice(i,1);
+  if(kind==='b') state.bonuses.splice(i,1);
+  renderManage();
+}
+function renderManage(){
+  document.getElementById('gHead').textContent=`Spiele (${unusedGames().length} von ${state.games.length} offen)`;
+  document.getElementById('pHead').textContent=`Strafen (${openPens().length} von ${state.penalties.length} offen)`;
+  document.getElementById('mGames').innerHTML=state.games.map((g,i)=>
+    `<div class="item ${state.usedGames.includes(g.n)?'used':''}"><div>${esc(g.n)}${g.type?'<span class="tag">Handy</span>':''}<small>${esc(g.r)}</small></div>
+     <button class="del" onclick="del('g',${i})" aria-label="Löschen">✕</button></div>`).join('');
+  document.getElementById('mPens').innerHTML=state.penalties.map((p,i)=>
+    `<div class="item ${state.usedPenalties.includes(p)?'used':''}"><div>${esc(p)}</div>
+     <button class="del" onclick="del('p',${i})" aria-label="Löschen">✕</button></div>`).join('');
+  document.getElementById('mBonus').innerHTML=state.bonuses.map((b,i)=>
+    `<div class="item"><div>${esc(b)}</div><button class="del" onclick="del('b',${i})" aria-label="Löschen">✕</button></div>`).join('');
+  persist();
+}
+
+/* ================= Speichern ================= */
+const KEY='ferdis-jga-v2';
+let saveTimer=null;
+function snapshot(){
+  return JSON.stringify({
+    v:2, started:state.started, sound:state.sound, mode:state.mode,
+    usedGames:state.usedGames, usedPenalties:state.usedPenalties,
+    teams:state.teams, games:state.games, penalties:state.penalties,
+    bonuses:state.bonuses, logs:state.logs, cur:state.cur
+  });
+}
+async function writeStore(json){
+  try{ if(window.storage&&window.storage.set){ await window.storage.set(KEY,json); return 'ok'; } }catch(e){}
+  try{ localStorage.setItem(KEY,json); return 'ok'; }catch(e){}
+  return 'fail';
+}
+async function readStore(){
+  try{ if(window.storage&&window.storage.get){ const r=await window.storage.get(KEY); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
+  try{ const v=localStorage.getItem(KEY); if(v) return JSON.parse(v); }catch(e){}
+  return null;
+}
+function persist(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const res=await writeStore(snapshot());
+    const el=document.getElementById('saveStatus'); if(!el) return;
+    el.textContent = res==='ok'
+      ? 'Stand gespeichert um '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})
+      : 'Speichern klappt hier nicht – Tab offen lassen';
+  },250);
+}
+function resetNight(){
+  ask('Punkte, Verlauf und die schon gespielten Spiele werden zurückgesetzt. Teams, Spiele und Strafen bleiben erhalten.',()=>{
+    state.teams.forEach(t=>t.pts=0);
+    state.logs=[]; state.usedGames=[]; state.usedPenalties=[];
+    state.cur={game:null,a:null,b:null,ref:null,first:null,winner:null,loser:null,pen:null,bonusIdx:null};
+    renderAll(); show('s-hub');
+    note('Neuer Abend steht. Alle Teams bei null.');
+  },'Zurücksetzen');
+}
+
+/* ================= Start ================= */
+async function boot(){
+  const s=await readStore();
+  if(s&&s.teams){
+    state.teams=s.teams;
+    if(s.penalties) s.penalties.forEach(p=>{ if(!state.penalties.includes(p)) state.penalties.push(p); });
+    if(s.bonuses) s.bonuses.forEach(b=>{ if(!state.bonuses.includes(b)) state.bonuses.push(b); });
+    state.logs=s.logs||[];
+    state.usedGames=s.usedGames||[];
+    state.usedPenalties=s.usedPenalties||[];
+    state.sound=s.sound!==false;
+    state.mode=s.mode||'both';
+    state.started=!!s.started;
+    /* Handy-Spiele haben Funktionen im Inhalt, daher nur eigene Zusatzspiele aus dem Speicher übernehmen */
+    if(s.games&&s.games.length){
+      const known=state.games.map(g=>g.n);
+      s.games.filter(g=>!known.includes(g.n)).forEach(g=>state.games.push({n:g.n,r:g.r}));
+    }
+    if(s.cur&&s.cur.game){
+      const live=state.games.find(g=>g.n===s.cur.game.n);
+      state.cur=Object.assign(state.cur,s.cur,{game:live||null});
+    }
+  }
+  renderSetup(); renderAll();
+  if(state.started){
+    if(state.cur.game) drawTeamsFromSaved();
+    show('s-hub');
+  }
+}
+function drawTeamsFromSaved(){
+  const t=state.teams, g=state.cur.game;
+  document.getElementById('rulesTitle').innerHTML=esc(g.n)+(g.type?'<span class="tag">Am Handy</span>':'');
+  document.getElementById('rulesText').textContent=g.r;
+  document.getElementById('rulesMatch').textContent=`${t[state.cur.a].name} vs ${t[state.cur.b].name} · Schiri: ${t[state.cur.ref].name}`;
+  const go=document.getElementById('rulesGo');
+  if(g.type){ go.textContent='Spiel starten'; go.onclick=startDigital; }
+  else { go.textContent='Spiel ist durch'; go.onclick=openWinner; }
+}
+boot();
+window.addEventListener('resize',()=>{
+  if(document.getElementById('s-gamewheel').classList.contains('on')) drawWheel('gameCanvas',openGames().map(g=>g.n));
+  if(document.getElementById('s-penwheel').classList.contains('on')) drawWheel('penCanvas',openPens());
+});
+</script>
+</body>
+</html>
