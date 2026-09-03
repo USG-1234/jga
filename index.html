@@ -184,6 +184,7 @@ label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
   <p class="eyebrow" style="text-align:center" id="saveStatus">Wird gespeichert…</p>
   <div class="row">
     <button class="btn ghost sm" id="soundBtn" onclick="toggleSound()">Ton an</button>
+    <button class="btn ghost sm" onclick="testSound()">Ton testen</button>
     <button class="btn ghost sm" onclick="resetNight()">Neuer Abend</button>
   </div>
 </section>
@@ -376,7 +377,19 @@ const CONTENT = {
     {e:'🛷',a:'Schlitten'},{e:'🧰',a:'Werkzeugkasten'},{e:'🦂',a:'Skorpion'},{e:'🧪',a:'Reagenzglas'},
     {e:'🛴',a:'Roller'},{e:'🦦',a:'Otter'},{e:'🪴',a:'Zimmerpflanze'},{e:'🪜',a:'Leiter'},
     {e:'🦥',a:'Faultier'},{e:'🪁',a:'Drachen'},{e:'🧭',a:'Kompass'},{e:'🦔',a:'Igel'},
-    {e:'🗿',a:'Osterinsel-Statue'},{e:'🧱',a:'Ziegelmauer'},{e:'🪑',a:'Stuhl'},{e:'🎻',a:'Geige'}
+    {e:'🗿',a:'Osterinsel-Statue'},{e:'🧱',a:'Ziegelmauer'},{e:'🪑',a:'Stuhl'},{e:'🎻',a:'Geige'},
+    {e:'🦓',a:'Zebra'},{e:'🐪',a:'Kamel'},{e:'🦏',a:'Nashorn'},{e:'🦛',a:'Flusspferd'},
+    {e:'🐊',a:'Krokodil'},{e:'🦚',a:'Pfau'},{e:'🦜',a:'Papagei'},{e:'🦢',a:'Schwan'},
+    {e:'🐝',a:'Biene'},{e:'🐌',a:'Schnecke'},{e:'🦀',a:'Krabbe'},{e:'🦞',a:'Hummer'},
+    {e:'🐢',a:'Schildkröte'},{e:'🦋',a:'Schmetterling'},{e:'🕷️',a:'Spinne'},{e:'🐿️',a:'Eichhörnchen'},
+    {e:'🦌',a:'Hirsch'},{e:'🐗',a:'Wildschwein'},{e:'🦇',a:'Fledermaus'},{e:'🍉',a:'Wassermelone'},
+    {e:'🥑',a:'Avocado'},{e:'🥨',a:'Brezel'},{e:'🍩',a:'Donut'},{e:'🥞',a:'Pfannkuchen'},
+    {e:'🍤',a:'Garnele'},{e:'🧅',a:'Zwiebel'},{e:'🌽',a:'Maiskolben'},{e:'🥕',a:'Karotte'},
+    {e:'⛵',a:'Segelboot'},{e:'🚜',a:'Traktor'},{e:'🚌',a:'Bus'},{e:'🎈',a:'Luftballon'},
+    {e:'🕰️',a:'Standuhr'},{e:'🔔',a:'Glocke'},{e:'🧸',a:'Teddybär'},{e:'🗝️',a:'Schlüssel'},
+    {e:'🧳',a:'Koffer'},{e:'☂️',a:'Regenschirm'},{e:'👑',a:'Krone'},{e:'💎',a:'Diamant'},
+    {e:'🔦',a:'Taschenlampe'},{e:'🧹',a:'Besen'},{e:'🪣',a:'Eimer'},{e:'🥊',a:'Boxhandschuh'},
+    {e:'♟️',a:'Schachfigur'},{e:'🎳',a:'Bowlingkugel'},{e:'⚙️',a:'Zahnrad'},{e:'🔋',a:'Batterie'}
   ],
   flag:[
     {e:'🇧🇷',a:'Brasilien'},{e:'🇵🇹',a:'Portugal'},{e:'🇯🇵',a:'Japan'},{e:'🇦🇷',a:'Argentinien'},
@@ -386,13 +399,24 @@ const CONTENT = {
     {e:'🇲🇦',a:'Marokko'},{e:'🇨🇱',a:'Chile'},{e:'🇭🇷',a:'Kroatien'},{e:'🇸🇪',a:'Schweden'},
     {e:'🇦🇺',a:'Australien'},{e:'🇪🇬',a:'Ägypten'},{e:'🇺🇦',a:'Ukraine'},{e:'🇮🇩',a:'Indonesien'},
     {e:'🇸🇰',a:'Slowakei'},{e:'🇸🇮',a:'Slowenien'},{e:'🇷🇸',a:'Serbien'},{e:'🇧🇬',a:'Bulgarien'},
-    {e:'🇷🇴',a:'Rumänien'},{e:'🇱🇹',a:'Litauen'},{e:'🇪🇪',a:'Estland'},{e:'🇵🇾',a:'Paraguay'},
-    {e:'🇺🇾',a:'Uruguay'},{e:'🇵🇪',a:'Peru'},{e:'🇧🇴',a:'Bolivien'},{e:'🇰🇪',a:'Kenia'},
-    {e:'🇳🇬',a:'Nigeria'},{e:'🇬🇭',a:'Ghana'},{e:'🇹🇳',a:'Tunesien'},{e:'🇯🇴',a:'Jordanien'},
-    {e:'🇳🇵',a:'Nepal'},{e:'🇱🇰',a:'Sri Lanka'},{e:'🇲🇾',a:'Malaysia'},{e:'🇵🇭',a:'Philippinen'},
-    {e:'🇳🇿',a:'Neuseeland'},{e:'🇮🇸',a:'Island'},{e:'🇫🇮',a:'Finnland'},{e:'🇦🇱',a:'Albanien'},
-    {e:'🇲🇹',a:'Malta'},{e:'🇲🇳',a:'Mongolei'},{e:'🇰🇿',a:'Kasachstan'},{e:'🇶🇦',a:'Katar'},
-    {e:'🇱🇺',a:'Luxemburg'},{e:'🇨🇴',a:'Kolumbien'},{e:'🇻🇪',a:'Venezuela'},{e:'🇧🇦',a:'Bosnien und Herzegowina'}
+    {e:'🇷🇴',a:'Rumänien'},{e:'🇱🇹',a:'Litauen'},{e:'🇱🇻',a:'Lettland'},{e:'🇪🇪',a:'Estland'},
+    {e:'🇵🇾',a:'Paraguay'},{e:'🇺🇾',a:'Uruguay'},{e:'🇵🇪',a:'Peru'},{e:'🇧🇴',a:'Bolivien'},
+    {e:'🇰🇪',a:'Kenia'},{e:'🇳🇬',a:'Nigeria'},{e:'🇬🇭',a:'Ghana'},{e:'🇹🇳',a:'Tunesien'},
+    {e:'🇯🇴',a:'Jordanien'},{e:'🇳🇵',a:'Nepal'},{e:'🇱🇰',a:'Sri Lanka'},{e:'🇲🇾',a:'Malaysia'},
+    {e:'🇵🇭',a:'Philippinen'},{e:'🇳🇿',a:'Neuseeland'},{e:'🇮🇸',a:'Island'},{e:'🇫🇮',a:'Finnland'},
+    {e:'🇦🇱',a:'Albanien'},{e:'🇲🇹',a:'Malta'},{e:'🇲🇳',a:'Mongolei'},{e:'🇰🇿',a:'Kasachstan'},
+    {e:'🇶🇦',a:'Katar'},{e:'🇱🇺',a:'Luxemburg'},{e:'🇨🇴',a:'Kolumbien'},{e:'🇻🇪',a:'Venezuela'},
+    {e:'🇧🇦',a:'Bosnien und Herzegowina'},{e:'🇦🇹',a:'Österreich'},{e:'🇧🇪',a:'Belgien'},{e:'🇩🇰',a:'Dänemark'},
+    {e:'🇨🇿',a:'Tschechien'},{e:'🇭🇺',a:'Ungarn'},{e:'🇬🇪',a:'Georgien'},{e:'🇦🇲',a:'Armenien'},
+    {e:'🇦🇿',a:'Aserbaidschan'},{e:'🇲🇩',a:'Moldau'},{e:'🇲🇰',a:'Nordmazedonien'},{e:'🇲🇪',a:'Montenegro'},
+    {e:'🇨🇾',a:'Zypern'},{e:'🇮🇱',a:'Israel'},{e:'🇸🇦',a:'Saudi-Arabien'},{e:'🇦🇪',a:'Vereinigte Arabische Emirate'},
+    {e:'🇴🇲',a:'Oman'},{e:'🇮🇷',a:'Iran'},{e:'🇵🇰',a:'Pakistan'},{e:'🇧🇩',a:'Bangladesch'},
+    {e:'🇹🇭',a:'Thailand'},{e:'🇰🇭',a:'Kambodscha'},{e:'🇸🇬',a:'Singapur'},{e:'🇹🇼',a:'Taiwan'},
+    {e:'🇨🇺',a:'Kuba'},{e:'🇯🇲',a:'Jamaika'},{e:'🇨🇷',a:'Costa Rica'},{e:'🇵🇦',a:'Panama'},
+    {e:'🇬🇹',a:'Guatemala'},{e:'🇩🇴',a:'Dominikanische Republik'},{e:'🇪🇹',a:'Äthiopien'},{e:'🇹🇿',a:'Tansania'},
+    {e:'🇺🇬',a:'Uganda'},{e:'🇸🇳',a:'Senegal'},{e:'🇨🇲',a:'Kamerun'},{e:'🇦🇴',a:'Angola'},
+    {e:'🇳🇦',a:'Namibia'},{e:'🇧🇼',a:'Botswana'},{e:'🇲🇬',a:'Madagaskar'},{e:'🇩🇿',a:'Algerien'},
+    {e:'🇫🇯',a:'Fidschi'},{e:'🇵🇬',a:'Papua-Neuguinea'},{e:'🇲🇻',a:'Malediven'},{e:'🇧🇹',a:'Bhutan'}
   ],
   clue:[
     {a:'Porto',c:['Über den Fluss führt eine Eisenbrücke von einem Schüler Eiffels','Der Wein aus den Kellern am anderen Ufer trägt den Namen der Stadt','Die zweitgrößte Stadt Portugals']},
@@ -420,7 +444,59 @@ const CONTENT = {
     {a:'Lyon',c:['Hier wurde das Kino erfunden','Gilt als heimliche Hauptstadt der französischen Küche','Drittgrößte Stadt Frankreichs, zwei Flüsse treffen sich']},
     {a:'Palermo',c:['In den Katakomben stehen hunderte angezogene Mumien','Arabische, normannische und spanische Spuren in einer Altstadt','Die Hauptstadt Siziliens']},
     {a:'Frankfurt',c:['Mitten in Deutschland steht hier eine echte Skyline','Apfelwein und Grüne Soße','Die Heimat der Eintracht']},
-    {a:'Reykjavík',c:['Die nördlichste Hauptstadt der Welt','Heißes Wasser kommt hier direkt aus dem Boden','Die Hauptstadt von Island']}
+    {a:'Reykjavík',c:['Die nördlichste Hauptstadt der Welt','Heißes Wasser kommt hier direkt aus dem Boden','Die Hauptstadt von Island']},
+    {a:'Bologna',c:['Zwei schiefe Türme stehen mitten in der Altstadt','Hier steht die älteste Universität Europas','Von hier kommt die Sauce, die überall falsch benannt wird']},
+    {a:'Bilbao',c:['Ein Museum aus Titanwellen hat die ganze Stadt gerettet','Pintxos an der Theke statt Tapas','Die größte Stadt im Baskenland']},
+    {a:'Málaga',c:['Picasso wurde hier geboren','Die Hafenstadt an der Costa del Sol','Zweitgrößte Stadt Andalusiens']},
+    {a:'Toulouse',c:['Die ganze Stadt ist rosa, weil alles aus Backstein gebaut ist','Hier werden die Airbus-Flugzeuge zusammengeschraubt','Die viertgrößte Stadt Frankreichs']},
+    {a:'Bordeaux',c:['Ein flacher Wasserspiegel am Ufer ist das beliebteste Fotomotiv','Der Wein trägt den Namen der Stadt','Die große Stadt im Südwesten Frankreichs']},
+    {a:'Nizza',c:['Die Uferpromenade ist nach den Engländern benannt','Ein Salat mit Sardellen und Oliven trägt den Namen der Stadt','Die größte Stadt an der französischen Riviera']},
+    {a:'Straßburg',c:['Hier sitzt das Europäische Parlament','Fachwerkhäuser im Viertel Petite France','Die Hauptstadt des Elsass']},
+    {a:'Den Haag',c:['Hier sitzt der Internationale Gerichtshof','Regierungssitz des Landes, aber nicht die Hauptstadt','Die dritte große Stadt der Niederlande']},
+    {a:'Utrecht',c:['Der Domturm ist der höchste Kirchturm des Landes','Grachten mit Terrassen unterhalb des Straßenniveaus','Die vierte große Stadt der Niederlande']},
+    {a:'Gent',c:['Ein Altarbild der Brüder van Eyck ist der Schatz der Stadt','Studentenstadt mit einer Burg mitten im Zentrum','Große Stadt in Flandern, zwischen Brügge und Brüssel']},
+    {a:'Brügge',c:['Kanäle und Kopfsteinpflaster wie im Mittelalter stehengeblieben','Spitze und Pralinen an jeder Ecke','Die Hauptstadt von Westflandern']},
+    {a:'Zürich',c:['Gilt in vielen Rankings als teuerste Stadt Europas','Banken, ein See und Bergblick bei Föhn','Die größte Stadt der Schweiz']},
+    {a:'Genf',c:['Ein 140 Meter hoher Wasserstrahl schießt aus dem See','UNO-Sitz, und nebenan liegt der größte Teilchenbeschleuniger','Die zweitgrößte Stadt der Schweiz']},
+    {a:'Basel',c:['Drei Länder treffen sich hier an einem einzigen Punkt','Die Fasnacht startet um vier Uhr morgens im Dunkeln','Die Stadt am Rheinknie in der Schweiz']},
+    {a:'Salzburg',c:['Mozart wurde hier geboren','Eine Festung über der Stadt, Festspiele im Sommer','Die viertgrößte Stadt Österreichs']},
+    {a:'Graz',c:['Ein glänzendes Gebilde wie ein Zeppelin dient als Kunsthaus','Eine der besterhaltenen Altstädte Mitteleuropas','Die zweitgrößte Stadt Österreichs']},
+    {a:'Innsbruck',c:['Ein goldenes Dachl über einem Erker ist das Wahrzeichen','Zweimal fanden hier Olympische Winterspiele statt','Die Hauptstadt Tirols']},
+    {a:'Mailand',c:['Ein Dom mit über 3000 Statuen auf dem Dach','Mode, Börse und ein Wandbild vom letzten Abendmahl','Die Wirtschaftshauptstadt Italiens']},
+    {a:'Florenz',c:['Eine Kuppel wurde hier ohne Gerüst gebaut','Die Uffizien und eine Brücke voller Goldschmiedeläden','Die Hauptstadt der Toskana']},
+    {a:'Genua',c:['Kolumbus wurde hier geboren','Pesto und die engsten Gassen Europas','Der größte Hafen Italiens']},
+    {a:'Catania',c:['Die Häuser sind aus schwarzem Lavastein gebaut','Direkt am Fuß des Ätna','Die zweitgrößte Stadt Siziliens']},
+    {a:'Sarajevo',c:['Ein Attentat hier löste den Ersten Weltkrieg aus','Winterolympiade 1984','Die Hauptstadt von Bosnien']},
+    {a:'Split',c:['Die Altstadt steckt komplett in einem römischen Kaiserpalast','Fähren zu den dalmatinischen Inseln legen hier ab','Die zweitgrößte Stadt Kroatiens']},
+    {a:'Belgrad',c:['Eine Festung wacht über den Zusammenfluss von Donau und Save','Partyboote liegen im Fluss vor der Stadt','Die Hauptstadt Serbiens']},
+    {a:'Odessa',c:['Eine monumentale Treppe führt hinunter zum Hafen','Ein weltbekanntes Opernhaus am Schwarzen Meer','Die große Hafenstadt der Ukraine']},
+    {a:'Breslau',c:['Über 300 kleine Bronzezwerge sind in der Stadt versteckt','Die Oder teilt sich hier in viele Arme mit Inseln','Die größte Stadt Niederschlesiens in Polen']},
+    {a:'Bergen',c:['Bunte Holzhäuser stehen am alten Hansekai','Es regnet hier an über 200 Tagen im Jahr','Die zweitgrößte Stadt Norwegens']},
+    {a:'Tallinn',c:['Eine der besterhaltenen Stadtmauern Nordeuropas','Hier wurde Skype gebaut, das Land gilt als Digitalvorreiter','Die Hauptstadt Estlands']},
+    {a:'Riga',c:['Die größte Sammlung von Jugendstilhäusern in Europa','Der Zentralmarkt liegt in alten Zeppelinhangars','Die Hauptstadt Lettlands']},
+    {a:'Manchester',c:['Gilt als die erste Industriestadt der Welt','Zwei Weltklub-Fußballvereine in einer Stadt','Die große Stadt im Norden Englands']},
+    {a:'Liverpool',c:['Vier Musiker von hier haben die Popmusik umgestülpt','Zwei Fußballklubs und alte Docks am Fluss','Die Hafenstadt im Nordwesten Englands']},
+    {a:'Edinburgh',c:['Eine Burg thront auf einem alten Vulkanfelsen','Im August läuft hier das größte Kunstfestival der Welt','Die Hauptstadt Schottlands']},
+    {a:'Marrakesch',c:['Abends stehen Schlangenbeschwörer und Garküchen auf einem großen Platz','Rote Lehmmauern, Souks und Riads','Die bekannteste Stadt im Süden Marokkos']},
+    {a:'Chicago',c:['Hier wurde der erste Wolkenkratzer der Welt gebaut','Windy City und eine Pizza mit sehr hohem Rand','Die größte Stadt am Michigansee']},
+    {a:'Boston',c:['Aus Protest landete hier einmal Tee im Hafen','Harvard liegt gleich auf der anderen Flussseite','Die größte Stadt Neuenglands']},
+    {a:'San Francisco',c:['Eine rote Brücke steht die halbe Zeit im Nebel','Kabelbahnen an steilen Straßen, eine Gefängnisinsel in der Bucht','Die Stadt an der Bucht in Nordkalifornien']},
+    {a:'Seattle',c:['Ein Turm wie eine Untertasse aus den Sechzigern','Hier eröffnete der erste Starbucks','Die größte Stadt im Nordwesten der USA']},
+    {a:'Toronto',c:['Ein 553 Meter hoher Turm mit Glasboden zum Draufstellen','Größte Stadt des Landes, aber nicht die Hauptstadt','Die größte Stadt Kanadas']},
+    {a:'Montreal',c:['Die zweitgrößte französischsprachige Stadt der Welt','Ein Berg mitten in der Stadt, dazu Bagels und Poutine','Die größte Stadt in Québec']},
+    {a:'São Paulo',c:['Die größte Stadt der südlichen Halbkugel','Endlose Hochhäuser, und trotz Brasilien kein Strand','Die Wirtschaftsmetropole Brasiliens']},
+    {a:'Valparaíso',c:['Bunte Häuser kleben an steilen Hügeln, alte Standseilbahnen fahren hoch','Der Dichter Neruda lebte in dieser Hafenstadt','Die berühmteste Hafenstadt Chiles']},
+    {a:'Cusco',c:['Die frühere Hauptstadt der Inka','Von hier startet man zum Machu Picchu','Die Andenstadt in Peru']},
+    {a:'Mumbai',c:['Ein Triumphbogen am Wasser wurde für einen britischen König gebaut','Von hier kommt Bollywood','Die Finanzmetropole Indiens']},
+    {a:'Shanghai',c:['Kolonialbauten am Ufer stehen einer Zukunftsskyline gegenüber','Größte Stadt des Landes und größter Containerhafen der Welt','Die Wirtschaftsmetropole Chinas']},
+    {a:'Hongkong',c:['Eine Bergbahn zieht sich hoch zum Peak, unten fahren Doppeldeckerbahnen','Bis 1997 war die Stadt britisch','Sonderverwaltungszone im Süden Chinas']},
+    {a:'Kyoto',c:['Über tausend Tempel und tausend Jahre Kaiserstadt','Ein Tunnel aus tausenden orangen Torii führt den Berg hoch','Die alte Hauptstadt Japans']},
+    {a:'Sapporo',c:['Im Februar läuft hier ein riesiges Schneefestival','Winterolympiade 1972, und ein Bier trägt den Namen der Stadt','Die größte Stadt auf Hokkaido']},
+    {a:'Perth',c:['Die abgelegenste Millionenstadt der Welt','Bis zur nächsten Großstadt sind es fünf Stunden Flug','Die Hauptstadt von Westaustralien']},
+    {a:'Auckland',c:['Die Stadt steht auf 48 alten Vulkankegeln','Segelboote überall, dazu ein Sky Tower','Die größte Stadt Neuseelands']},
+    {a:'Durban',c:['Der größte Hafen Afrikas, am Indischen Ozean','Große indische Community, Curry im ausgehöhlten Brot','Die dritte große Stadt Südafrikas']},
+    {a:'Lagos',c:['Die größte Stadt Afrikas','Von hier kommen Afrobeats und Nollywood','Die Wirtschaftsmetropole Nigerias']},
+    {a:'Nairobi',c:['Ein Nationalpark mit Löwen grenzt direkt an die Skyline','Sitz vieler UN-Büros in Afrika','Die Hauptstadt Kenias']}
   ],
   emoji:[
     {e:'🔥🚒👨‍🚒',a:'Feuerwehr'},{e:'🎂🎈🎁',a:'Geburtstag'},{e:'🧛🦇🩸',a:'Vampir'},
@@ -439,8 +515,25 @@ const CONTENT = {
     {e:'🎻🎼🎩',a:'Orchester'},{e:'🌪️🏠🥿',a:'Der Zauberer von Oz'},{e:'🎪🤹🐘',a:'Zirkus'},
     {e:'🏔️🎿☃️',a:'Skiurlaub'},{e:'🚬🚭🙅',a:'Rauchverbot'},{e:'🧭🗺️🏴‍☠️',a:'Schatzsuche'},
     {e:'🌡️🤒🛌',a:'Grippe'},{e:'💡🧠❗',a:'Geistesblitz'},{e:'🕯️👻🏚️',a:'Spukhaus'},
-    {e:'🥁🐒🔋',a:'Batterie-Werbung'},{e:'🪞👸🍎',a:'Schneewittchen'},{e:'🐸👑💋',a:'Froschkönig'},
-    {e:'👣🏝️⛵',a:'Robinson Crusoe'}
+    {e:'🪞👸🍎',a:'Schneewittchen'},{e:'🐸👑💋',a:'Froschkönig'},{e:'👣🏝️⛵',a:'Robinson Crusoe'},
+    {e:'🐛🦋🌿',a:'Verwandlung'},{e:'🥶❄️🧣',a:'Winter'},{e:'🍔🍟🥤',a:'Fastfood'},
+    {e:'🧹🧙‍♀️🌙',a:'Hexe'},{e:'🦇🕷️🎃',a:'Halloween'},{e:'🐷🏠🐺',a:'Die drei kleinen Schweinchen'},
+    {e:'🏹🌳💰',a:'Robin Hood'},{e:'🧜‍♀️🌊🐚',a:'Meerjungfrau'},{e:'🎩🐇✨',a:'Zaubertrick'},
+    {e:'🪕🤠🌵',a:'Western'},{e:'🍝🇮🇹👨‍🍳',a:'Italienisches Restaurant'},{e:'🧀🇨🇭⛰️',a:'Schweiz'},
+    {e:'🛌😴💭',a:'Traum'},{e:'⏰🏃‍♂️🚌',a:'Verschlafen'},{e:'📉💸😱',a:'Börsencrash'},
+    {e:'🔑🚪😰',a:'Ausgeschlossen'},{e:'💌❤️📮',a:'Liebesbrief'},{e:'👶🍼😴',a:'Baby'},
+    {e:'🌻🐝☀️',a:'Sommer'},{e:'🍂🌰🐿️',a:'Herbst'},{e:'🌷🐣🌱',a:'Frühling'},
+    {e:'🚨🚓🏃',a:'Verfolgungsjagd'},{e:'🍞🧈🥐',a:'Bäckerei'},{e:'🥩🔥🍺',a:'Grillabend'},
+    {e:'🧺🌳🍉',a:'Picknick'},{e:'🎡🎢🍭',a:'Kirmes'},{e:'⛺🔥🌲',a:'Camping'},
+    {e:'🚗🗺️🧭',a:'Roadtrip'},{e:'✈️🧳🛂',a:'Flughafen'},{e:'🏨🛎️🔑',a:'Hotel'},
+    {e:'🏦💰🎭',a:'Bankraub'},{e:'🩺❤️📋',a:'Arztbesuch'},{e:'🦴🔬🏛️',a:'Museum'},
+    {e:'🎨🖌️🖼️',a:'Malerei'},{e:'🧑‍🍳🔥🥘',a:'Kochen'},{e:'🚴‍♂️⛰️🥇',a:'Radrennen'},
+    {e:'🏊‍♂️🏅💧',a:'Schwimmwettkampf'},{e:'🎳🎯💥',a:'Bowling'},{e:'♟️🧠⏱️',a:'Schach'},
+    {e:'🃏🎲💰',a:'Casino'},{e:'📖🕯️🛏️',a:'Gutenachtgeschichte'},{e:'🔨⚒️⛏️',a:'Bergwerk'},
+    {e:'🚜🌾👨‍🌾',a:'Landwirtschaft'},{e:'🐄🥛🧈',a:'Milchprodukte'},{e:'🍇🍷🛢️',a:'Weinherstellung'},
+    {e:'🌶️🥵💦',a:'Scharfes Essen'},{e:'🧊🥃🎩',a:'Whisky'},{e:'🇳🇱🌷🚲',a:'Niederlande'},
+    {e:'🇮🇪☘️🍺',a:'Irland'},{e:'🗽🍎🚕',a:'New York'},{e:'🗼🥖💋',a:'Paris'},
+    {e:'🎡👑☕',a:'London'},{e:'🐼🏮🥢',a:'China'},{e:'🐨🦘🌏',a:'Australien'}
   ],
   high:[
     {q:'Wer hat mehr Einwohner?',l:{t:'Berlin',v:'3,7 Mio'},r:{t:'Madrid',v:'3,3 Mio'},w:'l'},
@@ -469,10 +562,33 @@ const CONTENT = {
     {q:'Was ist heißer?',l:{t:'Sonnenoberfläche',v:'ca. 5.500 °C'},r:{t:'Ein Blitz',v:'bis 30.000 °C'},w:'r'},
     {q:'Was ist teurer pro Kilo?',l:{t:'Safran',v:'ca. 10.000 €'},r:{t:'Gold',v:'weit über 50.000 €'},w:'r'},
     {q:'Was ist älter?',l:{t:'Hamburger Speicherstadt',v:'ab 1885'},r:{t:'Eiffelturm',v:'1889'},w:'l'},
-    {q:'Was ist tiefer?',l:{t:'Tiefste U-Bahn-Station der Welt',v:'ca. 105 m'},r:{t:'Tiefste Stelle der Ostsee',v:'459 m'},w:'r'}
+    {q:'Was ist größer?',l:{t:'Alaska',v:'1,72 Mio km²'},r:{t:'Türkei',v:'783.000 km²'},w:'l'},
+    {q:'Wer hat mehr Einwohner?',l:{t:'Nigeria',v:'ca. 223 Mio'},r:{t:'Russland',v:'ca. 144 Mio'},w:'l'},
+    {q:'Welcher Fluss ist länger?',l:{t:'Nil',v:'ca. 6.650 km'},r:{t:'Amazonas',v:'ca. 6.400 km'},w:'l'},
+    {q:'Welcher Berg ist höher?',l:{t:'Kilimandscharo',v:'5.895 m'},r:{t:'Mont Blanc',v:'4.808 m'},w:'l'},
+    {q:'Welche Uni wurde früher gegründet?',l:{t:'Bologna',v:'1088'},r:{t:'Oxford',v:'um 1096'},w:'l'},
+    {q:'Was wurde früher erfunden?',l:{t:'Das Telefon',v:'1876'},r:{t:'Die Glühbirne',v:'1879'},w:'l'},
+    {q:'Was ist größer?',l:{t:'Grönland',v:'2,17 Mio km²'},r:{t:'Saudi-Arabien',v:'2,15 Mio km²'},w:'l'},
+    {q:'Wer lebt länger?',l:{t:'Eine Arbeitsbiene',v:'ca. 6 Wochen'},r:{t:'Eine Eintagsfliege',v:'ca. 1 Tag'},w:'l'},
+    {q:'Was ist schneller im Wasser?',l:{t:'Segelfisch',v:'ca. 110 km/h'},r:{t:'Delfin',v:'ca. 55 km/h'},w:'l'},
+    {q:'Was wiegt mehr, ein Liter?',l:{t:'Honig',v:'ca. 1,4 kg'},r:{t:'Wasser',v:'1 kg'},w:'l'},
+    {q:'Was ist höher?',l:{t:'Berliner Fernsehturm',v:'368 m'},r:{t:'Eiffelturm',v:'330 m'},w:'l'},
+    {q:'Welche Stadt ist größer?',l:{t:'Hamburg',v:'ca. 1,9 Mio'},r:{t:'München',v:'ca. 1,5 Mio'},w:'l'},
+    {q:'Was ist tiefer eingeschnitten?',l:{t:'Grand Canyon',v:'bis 1.800 m'},r:{t:'Verdonschlucht',v:'bis 700 m'},w:'l'},
+    {q:'Welcher Staat ist größer?',l:{t:'Vatikan',v:'0,44 km²'},r:{t:'Monaco',v:'2,1 km²'},w:'r'},
+    {q:'Was ist heißer?',l:{t:'Backofen auf höchster Stufe',v:'ca. 250 °C'},r:{t:'Öl in der Fritteuse',v:'ca. 180 °C'},w:'l'},
+    {q:'Was ist schwerer?',l:{t:'Golfball',v:'46 g'},r:{t:'Tennisball',v:'58 g'},w:'r'},
+    {q:'Was ist länger?',l:{t:'Ein Fußballfeld',v:'105 m'},r:{t:'Ein Jumbojet',v:'ca. 76 m'},w:'l'},
+    {q:'Was hat mehr Koffein?',l:{t:'Tasse Filterkaffee',v:'ca. 95 mg'},r:{t:'Ein Espresso',v:'ca. 65 mg'},w:'l'},
+    {q:'Was wurde früher gebaut?',l:{t:'Kolosseum',v:'80 n. Chr.'},r:{t:'Pantheon in Rom',v:'126 n. Chr.'},w:'l'},
+    {q:'Was ist größer?',l:{t:'Bayern',v:'70.500 km²'},r:{t:'Irland',v:'70.300 km²'},w:'l'},
+    {q:'Wovon gibt es mehr?',l:{t:'Sterne in der Milchstraße',v:'ca. 200 Mrd'},r:{t:'Bäume auf der Erde',v:'ca. 3 Billionen'},w:'r'},
+    {q:'Was dauert länger?',l:{t:'Ein Tag auf dem Mars',v:'24,6 Stunden'},r:{t:'Ein Tag auf der Erde',v:'24 Stunden'},w:'l'},
+    {q:'Was ist schneller?',l:{t:'Der schnellste Mensch',v:'ca. 45 km/h'},r:{t:'Ein Strauß',v:'ca. 70 km/h'},w:'r'},
+    {q:'Wer hat mehr Zähne?',l:{t:'Ein Hund',v:'42'},r:{t:'Ein Mensch',v:'32'},w:'l'},
+    {q:'Was ist höher?',l:{t:'Angel Falls, Wasserfall',v:'979 m'},r:{t:'Burj Khalifa',v:'828 m'},w:'l'},
+    {q:'Was ist salziger?',l:{t:'Totes Meer',v:'ca. 34 %'},r:{t:'Mittelmeer',v:'ca. 3,8 %'},w:'l'}
   ],
-  react:[{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},
-         {a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'}],
   guess:[
     {q:'Wie viele Einwohner hat Island?',a:390000},
     {q:'Wie hoch ist der Eiffelturm in Metern?',a:330},
@@ -522,12 +638,61 @@ const CONTENT = {
     {q:'Wie viele Treppenstufen hat der Schiefe Turm von Pisa?',a:296},
     {q:'Wie viele Knochen hat ein Neugeborenes?',a:300},
     {q:'Wie viele Liter Luft atmet ein Mensch pro Tag?',a:12000},
-    {q:'Wie viele Kilometer Gefäße hat der menschliche Körper?',a:100000},
-    {q:'Wie viele Einwohner hat Island pro Quadratkilometer?',a:4},
-    {q:'Wie viele Jahre dauert eine Umrundung der Sonne durch den Jupiter?',a:12},
-    {q:'Wie viele Buchstaben hat das längste Wort im Duden?',a:44},
-    {q:'Wie viele Nudelsorten gibt es in Italien ungefähr?',a:350},
-    {q:'Wie viele Grad hat die Sonnenoberfläche in Celsius?',a:5500}
+    {q:'Wie viele Kilometer Blutgefäße hat der menschliche Körper?',a:100000},
+    {q:'Wie viele Jahre braucht Jupiter für eine Runde um die Sonne?',a:12},
+    {q:'Wie viele Grad hat die Sonnenoberfläche in Celsius?',a:5500},
+    {q:'Wie viele Bundesstaaten hat die USA?',a:50},
+    {q:'Wie viele Spieler stehen beim Handball pro Team auf dem Feld?',a:7},
+    {q:'Wie viele Löcher hat ein Golfplatz?',a:18},
+    {q:'Wie viele Punkte hat ein Würfel insgesamt?',a:21},
+    {q:'Wie viele Sekunden dauert eine Runde im Profiboxen?',a:180},
+    {q:'Wie viele Saiten hat eine Konzertharfe?',a:47},
+    {q:'Wie viele Kilometer ist ein Marathon lang?',a:42},
+    {q:'Wie viele Fahrer starten bei der Tour de France?',a:176},
+    {q:'Wie viele Liter Wasser verbraucht ein Deutscher pro Tag?',a:125},
+    {q:'Wie viele Kilogramm Kaffee trinkt ein Deutscher pro Jahr?',a:7},
+    {q:'Wie viele Brotsorten gibt es in Deutschland?',a:3200},
+    {q:'Wie viele Brauereien gibt es in Deutschland?',a:1500},
+    {q:'Wie viele Fußballvereine sind im DFB organisiert?',a:24000},
+    {q:'Wie viele Einwohner hat Köln?',a:1090000},
+    {q:'Wie viele Millionen Menschen leben in Deutschland?',a:84},
+    {q:'Wie viele Millionen Autos sind in Deutschland zugelassen?',a:49},
+    {q:'Wie viele Kilometer Autobahn hat Deutschland?',a:13200},
+    {q:'Wie viele Inseln gehören ungefähr zu Griechenland?',a:6000},
+    {q:'Wie viele Stufen hat die Freiheitsstatue bis zur Krone?',a:354},
+    {q:'Wie hoch ist der Uluru in Metern?',a:348},
+    {q:'Wie hoch ist der höchste Wasserfall der Welt in Metern?',a:979},
+    {q:'Wie tief ist der Baikalsee in Metern?',a:1642},
+    {q:'Wie viele Liter Wasser fasst ein Kubikmeter?',a:1000},
+    {q:'Wie viele Grad Celsius hat flüssige Lava?',a:1100},
+    {q:'Wie viele Minusgrade wurden am kältesten Ort der Erde gemessen?',a:89},
+    {q:'Wie schnell fährt ein ICE 3 maximal in km/h?',a:330},
+    {q:'Wie viele Kilometer sind es von Frankfurt nach Tokio?',a:9400},
+    {q:'Wie viele Jahre dauerte der Hundertjährige Krieg?',a:116},
+    {q:'In welchem Jahr fiel die Berliner Mauer?',a:1989},
+    {q:'Wie alt ist die Erde in Millionen Jahren?',a:4540},
+    {q:'Wie viele Pinguinarten gibt es?',a:18},
+    {q:'Wie viele Zähne hat ein Delfin?',a:100},
+    {q:'Wie viele Eier legt ein Legehuhn im Jahr?',a:300},
+    {q:'Wie schwer ist die Zunge eines Blauwals in Kilo?',a:2700},
+    {q:'Wie viele Stunden schläft ein Koala pro Tag?',a:20},
+    {q:'Wie viele Kilometer zieht eine Küstenseeschwalbe pro Jahr?',a:70000},
+    {q:'Wie viele Chromosomen hat der Mensch?',a:46},
+    {q:'Wie viele Geschmacksknospen hat die menschliche Zunge?',a:10000},
+    {q:'Wie oft blinzelt ein Mensch pro Minute?',a:15},
+    {q:'Wie viele Elemente hat das Periodensystem?',a:118},
+    {q:'Wie viele bekannte Monde hat der Jupiter?',a:95},
+    {q:'Wie weit ist die Sonne entfernt, in Millionen Kilometern?',a:150},
+    {q:'Wie schnell ist Licht in Kilometern pro Sekunde?',a:300000},
+    {q:'In welcher Höhe kreist die ISS, in Kilometern?',a:400},
+    {q:'Wie viele Minuten braucht die ISS für eine Erdumrundung?',a:92},
+    {q:'Wie viele Menschen waren bisher auf dem Mond?',a:12},
+    {q:'Wie viele Mitgliedsstaaten hat die UNO?',a:193},
+    {q:'Wie viele Amtssprachen hat die EU?',a:24},
+    {q:'Wie viele Karten hat ein Poker-Deck?',a:52},
+    {q:'Wie viele Steine hat ein Domino-Standardsatz?',a:28},
+    {q:'Wie viele Rippen hat der Mensch?',a:24},
+    {q:'Wie viele Wirbel hat die menschliche Wirbelsäule?',a:33}
   ],
   sound:[
     {a:'Polizeisirene',f:(c,t)=>{const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
@@ -583,13 +748,71 @@ const CONTENT = {
       bp.frequency.linearRampToValueAtTime(1500,t+1.7);bp.frequency.linearRampToValueAtTime(250,t+3.4);
       const g=c.createGain();g.gain.setValueAtTime(.05,t);g.gain.linearRampToValueAtTime(.7,t+1.7);
       g.gain.linearRampToValueAtTime(.05,t+3.4);
-      s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.4);}}
-  ]
+      s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.4);}},
+    {a:'Applaus',f:(c,t)=>{for(let i=0;i<160;i++){const s=c.createBufferSource();s.buffer=noise(c,.03);
+      const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1100+Math.random()*2200;
+      const g=c.createGain();const at=t+.05+Math.random()*3.2;
+      g.gain.setValueAtTime(.09,at);g.gain.exponentialRampToValueAtTime(.001,at+.03);
+      s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(at);s.stop(at+.04);}}},
+    {a:'Lagerfeuer',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,3.4);
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;
+      const g=c.createGain();g.gain.value=.07;
+      s.connect(lp);lp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.4);
+      for(let i=0;i<40;i++){const k=c.createBufferSource();k.buffer=noise(c,.02);
+        const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800+Math.random()*2500;
+        const kg=c.createGain();const at=t+Math.random()*3.2;
+        kg.gain.setValueAtTime(.16,at);kg.gain.exponentialRampToValueAtTime(.001,at+.02);
+        k.connect(bp);bp.connect(kg);kg.connect(c.destination);k.start(at);k.stop(at+.03);}}},
+    {a:'Meeresbrandung',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,4);
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1400;
+      const g=c.createGain();g.gain.setValueAtTime(.03,t);
+      [0,1.4,2.8].forEach(d=>{g.gain.linearRampToValueAtTime(.30,t+d+.7);g.gain.linearRampToValueAtTime(.04,t+d+1.4);});
+      s.connect(lp);lp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+4);}},
+    {a:'Feuerwerk',f:(c,t)=>{[0,1.1,2.3].forEach(d=>{const b=c.createBufferSource();b.buffer=noise(c,.6);
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=200;
+      const g=c.createGain();const at=t+d;g.gain.setValueAtTime(.9,at);g.gain.exponentialRampToValueAtTime(.01,at+.5);
+      b.connect(lp);lp.connect(g);g.connect(c.destination);b.start(at);b.stop(at+.6);
+      for(let i=0;i<26;i++){const k=c.createBufferSource();k.buffer=noise(c,.02);
+        const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2500+Math.random()*2500;
+        const kg=c.createGain();const ka=at+.15+Math.random()*.7;
+        kg.gain.setValueAtTime(.2,ka);kg.gain.exponentialRampToValueAtTime(.001,ka+.02);
+        k.connect(bp);bp.connect(kg);kg.connect(c.destination);k.start(ka);k.stop(ka+.03);}});}},
+    {a:'Türklingel',f:(c,t)=>{[[660,0],[520,.5]].forEach(([fr,d])=>{const o=c.createOscillator(),g=c.createGain();
+      const s=t+d;o.type='sine';o.frequency.value=fr;
+      g.gain.setValueAtTime(.25,s);g.gain.exponentialRampToValueAtTime(.001,s+.9);
+      o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+1);});}},
+    {a:'Zughupe',f:(c,t)=>{[311,392].forEach(fr=>{const o=c.createOscillator(),g=c.createGain();
+      o.type='sawtooth';o.frequency.value=fr;
+      const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1200;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.15);
+      g.gain.setValueAtTime(.12,t+1.6);g.gain.linearRampToValueAtTime(0,t+2);
+      o.connect(lp);lp.connect(g);g.connect(c.destination);o.start(t);o.stop(t+2.1);});}},
+    {a:'Staubsauger',f:(c,t)=>{const s=c.createBufferSource();s.buffer=noise(c,3.2);
+      const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=.8;
+      const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.22,t+.4);
+      g.gain.setValueAtTime(.22,t+2.8);g.gain.linearRampToValueAtTime(0,t+3.2);
+      s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);s.stop(t+3.2);
+      const o=c.createOscillator(),og=c.createGain();o.type='sawtooth';o.frequency.value=155;
+      og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(.05,t+.4);
+      og.gain.setValueAtTime(.05,t+2.8);og.gain.linearRampToValueAtTime(0,t+3.2);
+      o.connect(og);og.connect(c.destination);o.start(t);o.stop(t+3.2);}},
+    {a:'Bohrmaschine',f:(c,t)=>{const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+      o.type='sawtooth';lp.type='lowpass';lp.frequency.value=2200;
+      o.frequency.setValueAtTime(120,t);o.frequency.linearRampToValueAtTime(320,t+.3);
+      o.frequency.setValueAtTime(320,t+1.2);o.frequency.linearRampToValueAtTime(120,t+1.5);
+      o.frequency.setValueAtTime(120,t+1.9);o.frequency.linearRampToValueAtTime(340,t+2.2);
+      o.frequency.setValueAtTime(340,t+3);o.frequency.linearRampToValueAtTime(110,t+3.3);
+      g.gain.value=.10;o.connect(lp);lp.connect(g);g.connect(c.destination);o.start(t);o.stop(t+3.4);}}
+  ],
+  react:[{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},
+         {a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},
+         {a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},
+         {a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'},{a:'Reaktion'}]
 };
 
 /* ================= Zustand ================= */
 const state = {
-  started:false, sound:true, mode:'both', usedGames:[], usedPenalties:[],
+  started:false, sound:true, mode:'both', usedGames:[], usedPenalties:[], usedItems:{},
   teams:[
     {name:'Team 1', players:'', pts:0},
     {name:'Team 2', players:'', pts:0},
@@ -619,7 +842,10 @@ const state = {
     {n:'Schätzfrage', type:'guess', r:'Beide Teams tippen eine Zahl ins Handy. Wer näher dran ist, bekommt den Punkt. 5 Runden.'},
     {n:'Reaktionsduell', type:'react', r:'Handy zwischen die beiden Teams legen, jedes Team hat eine Hälfte. Getippt wird nur, wenn die ganze Fläche grün wird. Es kommen aber Fallen: falsche Farben, ein grüner Kreis, das Wort GRÜN auf Rot, ein abgebrochener Countdown. Wer bei einer Falle tippt, verliert die Runde sofort. 5 Runden.'},
     {n:'Höher oder tiefer', type:'high', r:'Zwei Sachen stehen gegeneinander. Beide Teams tippen ihren Favoriten an, danach wird aufgelöst. Beide richtig heißt Punkt für beide. 5 Runden.'},
-    {n:'Emoji-Rätsel', type:'emoji', r:'Drei Emojis beschreiben einen Begriff. Wer ihn zuerst nennt, bekommt den Punkt. Der Schiri tippt drauf. 5 Runden.'}
+    {n:'Emoji-Rätsel', type:'emoji', r:'Drei Emojis beschreiben einen Begriff. Wer ihn zuerst nennt, bekommt den Punkt. Der Schiri tippt drauf. 5 Runden.'},
+    {n:'Reaktionsduell 2', type:'react', r:'Zweite Ausgabe, neue Fallen. Handy zwischen die Teams legen, nur bei komplett grüner Fläche tippen. Wer bei einer Falle tippt, verliert die Runde. 5 Runden.'},
+    {n:'Schätzfrage 2', type:'guess', r:'Zweite Ausgabe mit neuen Fragen. Beide Teams tippen eine Zahl, wer näher dran ist, bekommt den Punkt. 5 Runden.'},
+    {n:'Höher oder tiefer 2', type:'high', r:'Zweite Ausgabe mit neuen Paaren. Beide Teams tippen ihren Favoriten an, dann wird aufgelöst. 5 Runden.'}
   ],
   penalties:[
     'Die Gegner eine Bar lang wie Götter behandeln',
@@ -671,62 +897,128 @@ function note(text,onOk){
   document.getElementById('modal').classList.add('on');
 }
 
-/* ================= Ton & Konfetti ================= */
-let actx=null;
-function ac(force){
-  if(!state.sound && !force) return null;
-  try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    if(actx.state==='suspended') actx.resume();
-    return actx;
-  }catch(e){ return null; }
-}
+/* ================= Ton & Konfetti =================
+   iOS-Safari schaltet die Web Audio API stumm, sobald der Klingelschalter
+   am Gehaeuse auf lautlos steht, und blockiert Ton ausserhalb einer
+   Nutzerberuehrung. Deshalb werden alle Geraeusche offline zu einer
+   WAV-Datei gerendert und ueber vorab freigeschaltete Audio-Elemente
+   abgespielt. Die ignorieren den Stummschalter. */
+let actx=null, audioOK=false, poolPos=0;
+const POOL=[], WAVS=new Map();
+
 function noise(ctx,dur){
   const n=Math.floor(ctx.sampleRate*dur), b=ctx.createBuffer(1,n,ctx.sampleRate), d=b.getChannelData(0);
   for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
   return b;
 }
-function unlockAudio(){
+function encodeWav(data,sr){
+  const n=data.length, ab=new ArrayBuffer(44+n*2), v=new DataView(ab);
+  const w=(o,t)=>{ for(let i=0;i<t.length;i++) v.setUint8(o+i,t.charCodeAt(i)); };
+  w(0,'RIFF'); v.setUint32(4,36+n*2,true); w(8,'WAVE'); w(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true);
+  v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,n*2,true);
+  let o=44;
+  for(let i=0;i<n;i++){ const x=Math.max(-1,Math.min(1,data[i])); v.setInt16(o,x<0?x*0x8000:x*0x7fff,true); o+=2; }
+  const bytes=new Uint8Array(ab); let bin='';
+  for(let i=0;i<bytes.length;i+=8192) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));
+  return 'data:audio/wav;base64,'+btoa(bin);
+}
+async function makeWav(key,dur,build){
+  if(WAVS.has(key)) return WAVS.get(key);
+  const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(!OC) return null;
   try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    if(actx.state==='suspended') actx.resume();
-    const b=actx.createBuffer(1,1,22050), s=actx.createBufferSource();
-    s.buffer=b; s.connect(actx.destination); s.start(0);
+    const ctx=new OC(1,Math.max(1,Math.ceil(44100*dur)),44100);
+    build(ctx,0);
+    const buf=await ctx.startRendering();
+    const uri=encodeWav(buf.getChannelData(0),44100);
+    WAVS.set(key,uri);
+    return uri;
+  }catch(e){ return null; }
+}
+function playUri(uri){
+  if(!uri||!state.sound||!POOL.length) return;
+  try{
+    const a=POOL[poolPos++%POOL.length];
+    a.pause(); a.currentTime=0; a.src=uri; a.volume=1;
+    const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{});
   }catch(e){}
 }
-document.addEventListener('touchend',unlockAudio,{once:true});
-document.addEventListener('click',unlockAudio,{once:true});
+function unlockAudio(){
+  if(audioOK) return;
+  audioOK=true;
+  const silent=encodeWav(new Float32Array(2200),22050);
+  for(let i=0;i<3;i++){
+    const a=new Audio();
+    a.setAttribute('playsinline',''); a.preload='auto';
+    a.src=silent; a.volume=0;
+    const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{});
+    POOL.push(a);
+  }
+  makeWav('drum',4.2,buildDrumroll);
+  makeWav('test',.5,(c,t)=>{ const o=c.createOscillator(),g=c.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(660,t); o.frequency.setValueAtTime(880,t+.18);
+    g.gain.setValueAtTime(.3,t); g.gain.setValueAtTime(.3,t+.34); g.gain.linearRampToValueAtTime(0,t+.42);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+.45); });
+}
+document.addEventListener('touchend',unlockAudio,{passive:true});
+document.addEventListener('click',unlockAudio);
 
-function tickSound(vol){
-  const ctx=ac(); if(!ctx) return;
-  const t=ctx.currentTime;
+/* --- Bausteine --- */
+function tickIn(ctx,at,vol){
   const s=ctx.createBufferSource(); s.buffer=noise(ctx,.025);
   const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2400; f.Q.value=2.5;
-  const g=ctx.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0008,t+.025);
-  s.connect(f);f.connect(g);g.connect(ctx.destination); s.start(t); s.stop(t+.03);
+  const g=ctx.createGain(); g.gain.setValueAtTime(vol,at); g.gain.exponentialRampToValueAtTime(.0008,at+.025);
+  s.connect(f); f.connect(g); g.connect(ctx.destination); s.start(at); s.stop(at+.03);
+}
+function drumIn(ctx,at,vol){
+  const s=ctx.createBufferSource(); s.buffer=noise(ctx,.06);
+  const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=190; f.Q.value=1.2;
+  const g=ctx.createGain(); g.gain.setValueAtTime(vol,at); g.gain.exponentialRampToValueAtTime(.001,at+.06);
+  s.connect(f); f.connect(g); g.connect(ctx.destination); s.start(at); s.stop(at+.07);
+}
+function crashIn(ctx,at){
+  const s=ctx.createBufferSource(); s.buffer=noise(ctx,1.5);
+  const f=ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=2800;
+  const g=ctx.createGain(); g.gain.setValueAtTime(.55,at); g.gain.exponentialRampToValueAtTime(.001,at+1.5);
+  s.connect(f); f.connect(g); g.connect(ctx.destination); s.start(at); s.stop(at+1.5);
+}
+function buildDrumroll(ctx){
+  for(let t=0;t<2.6;t+=.048) drumIn(ctx,t,.14+.36*(t/2.6));
+  crashIn(ctx,2.6);
 }
 
-function drumHit(ctx,at,vol){
-  const s=ctx.createBufferSource();s.buffer=noise(ctx,.06);
-  const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=190;f.Q.value=1.2;
-  const g=ctx.createGain();g.gain.setValueAtTime(vol,at);g.gain.exponentialRampToValueAtTime(.001,at+.06);
-  s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(at);s.stop(at+.07);
+/* --- Abspielen --- */
+async function playDrumroll(){ playUri(await makeWav('drum',4.2,buildDrumroll)); }
+async function playClatter(n){
+  const uri=await makeWav('spin'+n,4.8,ctx=>{
+    const seg=360/n, delta=360*6+180;
+    let lastSeg=0, lastMs=-99;
+    for(let ms=0;ms<=4600;ms+=6){
+      const sg=Math.floor(delta*EASE(ms/4600)/seg);
+      if(sg>lastSeg){ lastSeg=sg; if(ms-lastMs>26){ tickIn(ctx,ms/1000,.05+.13*(1-ms/4600)); lastMs=ms; } }
+    }
+  });
+  playUri(uri);
 }
-function playDrumroll(ms){
-  const ctx=ac(); if(!ctx) return;
-  const t0=ctx.currentTime, total=ms/1000;
-  for(let t=0;t<total;t+=.048) drumHit(ctx,t0+t,.12+.32*(t/total));
+async function playItemSound(){
+  const it=play.items[play.idx];
+  playUri(await makeWav('snd'+it.a,4.2,it.f));
 }
-function playCrash(){
-  const ctx=ac(); if(!ctx) return;
-  const t=ctx.currentTime, s=ctx.createBufferSource();
-  s.buffer=noise(ctx,1.4);
-  const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=2800;
-  const g=ctx.createGain();g.gain.setValueAtTime(.45,t);g.gain.exponentialRampToValueAtTime(.001,t+1.4);
-  s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(t);s.stop(t+1.4);
+async function testSound(){
+  unlockAudio();
+  const uri=await makeWav('test',.5,(c,t)=>{ const o=c.createOscillator(),g=c.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(660,t); o.frequency.setValueAtTime(880,t+.18);
+    g.gain.setValueAtTime(.3,t); g.gain.setValueAtTime(.3,t+.34); g.gain.linearRampToValueAtTime(0,t+.42);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+.45); });
+  if(!uri){ note('Dieser Browser kann den Ton nicht erzeugen. Alles andere funktioniert trotzdem.'); return; }
+  playUri(uri);
+  note('Es sollte gerade zweimal gepiept haben. Wenn nicht: Lautstaerke hoch und beim iPhone den Schalter an der Seite von lautlos wegdrehen.');
 }
+
 function confetti(){
-  const box=document.createElement('div');box.className='confetti';
+  const box=document.createElement('div'); box.className='confetti';
   for(let i=0;i<46;i++){
     const p=document.createElement('i');
     p.style.left=Math.random()*100+'%';
@@ -851,17 +1143,7 @@ function spinWheel(rotId,n,cb){
   const dur=4600;
   el.style.transition=`transform ${dur}ms cubic-bezier(.15,.72,.16,1)`;
   el.style.transform=`rotate(${rotAcc[rotId]}deg)`;
-  const t0=performance.now();
-  let lastSeg=0, lastTick=0;
-  (function frame(now){
-    const e=Math.min(1,(now-t0)/dur);
-    const s=Math.floor(delta*EASE(e)/seg);
-    if(s>lastSeg){
-      if(now-lastTick>26){ tickSound(.035+.085*(1-e)); lastTick=now; }
-      lastSeg=s;
-    }
-    if(e<1) requestAnimationFrame(frame);
-  })(t0);
+  playClatter(n);
   setTimeout(()=>cb(idx),dur+150);
 }
 
@@ -934,10 +1216,21 @@ function drawTeams(){
 
 /* ================= Handy-Spiele ================= */
 const play={type:null,idx:0,items:[],a:0,b:0};
+/* Zieht Fragen, die diesen Abend noch nicht dran waren. Erst wenn eine
+   Kategorie leer ist, wird sie wieder komplett freigegeben. */
+function pickItems(type,count){
+  if(!state.usedItems[type]) state.usedItems[type]=[];
+  let used=state.usedItems[type];
+  let free=CONTENT[type].map((_,i)=>i).filter(i=>!used.includes(i));
+  if(free.length<count){ used=state.usedItems[type]=[]; free=CONTENT[type].map((_,i)=>i); }
+  const chosen=shuffle(free).slice(0,count);
+  state.usedItems[type]=used.concat(chosen);
+  return chosen.map(i=>CONTENT[type][i]);
+}
 function startDigital(){
   const g=state.cur.game;
   play.type=g.type; play.idx=0; play.a=0; play.b=0; play.ready=false; play.revealed=false;
-  play.items=shuffle(CONTENT[g.type]).slice(0,5);
+  play.items=pickItems(g.type,5);
   document.getElementById('playTitle').textContent=g.n;
   show('s-play'); renderPlay();
 }
@@ -1119,11 +1412,6 @@ function reveal(){
   const d=document.createElement('div'); d.className='answer'; d.textContent=it.a;
   document.getElementById('playStage').appendChild(d);
 }
-function playItemSound(){
-  const ctx=ac(true);
-  if(!ctx){ note('Der Browser lässt gerade keinen Ton zu.'); return; }
-  play.items[play.idx].f(ctx,ctx.currentTime+.05);
-}
 function resolveGuess(){
   const it=play.items[play.idx], t=state.teams;
   const va=parseFloat(document.getElementById('gA').value);
@@ -1155,9 +1443,9 @@ function award(w){
   play.ready=false; play.revealed=false;
   if(play.idx<play.items.length){ renderPlay(); return; }
   if(play.a===play.b){
-    const pool=CONTENT[play.type].filter(x=>!play.items.includes(x));
+    const pool=pickItems(play.type,1).filter(x=>!play.items.includes(x));
     if(pool.length){
-      play.items.push(pool[rnd(pool.length)]);
+      play.items.push(pool[0]);
       renderPlay();
       note('Unentschieden – es gibt eine Stechrunde.');
       return;
@@ -1195,9 +1483,9 @@ function runDrumroll(m,done){
         panel=document.getElementById('scorePanel');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   hint.textContent='Moment mal…';
-  if(reduced){ mt.textContent='×'+m; hint.textContent=MULTI_LABEL[m]; playCrash(); done(); return; }
+  if(reduced){ mt.textContent='×'+m; hint.textContent=MULTI_LABEL[m]; done(); return; }
   panel.classList.add('shake');
-  const dur=2600; playDrumroll(dur);
+  const dur=2600; playDrumroll();
   const faces=['×2','×3','×5'];
   let el=0, delay=55;
   (function tick(){
@@ -1207,7 +1495,7 @@ function runDrumroll(m,done){
     mt.textContent='×'+m; hint.textContent=MULTI_LABEL[m];
     panel.classList.remove('shake');
     mt.classList.add('slam'); replay(mt);
-    playCrash(); confetti();
+    confetti();
     setTimeout(done,400);
   })();
 }
@@ -1347,7 +1635,7 @@ let saveTimer=null;
 function snapshot(){
   return JSON.stringify({
     v:2, started:state.started, sound:state.sound, mode:state.mode,
-    usedGames:state.usedGames, usedPenalties:state.usedPenalties,
+    usedGames:state.usedGames, usedPenalties:state.usedPenalties, usedItems:state.usedItems,
     teams:state.teams, games:state.games, penalties:state.penalties,
     bonuses:state.bonuses, logs:state.logs, cur:state.cur
   });
@@ -1375,7 +1663,7 @@ function persist(){
 function resetNight(){
   ask('Punkte, Verlauf und die schon gespielten Spiele werden zurückgesetzt. Teams, Spiele und Strafen bleiben erhalten.',()=>{
     state.teams.forEach(t=>t.pts=0);
-    state.logs=[]; state.usedGames=[]; state.usedPenalties=[];
+    state.logs=[]; state.usedGames=[]; state.usedPenalties=[]; state.usedItems={};
     state.cur={game:null,a:null,b:null,ref:null,first:null,winner:null,loser:null,pen:null,bonusIdx:null};
     renderAll(); show('s-hub');
     note('Neuer Abend steht. Alle Teams bei null.');
@@ -1392,6 +1680,7 @@ async function boot(){
     state.logs=s.logs||[];
     state.usedGames=s.usedGames||[];
     state.usedPenalties=s.usedPenalties||[];
+    state.usedItems=s.usedItems||{};
     state.sound=s.sound!==false;
     state.mode=s.mode||'both';
     state.started=!!s.started;
