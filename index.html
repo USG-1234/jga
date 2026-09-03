@@ -687,6 +687,26 @@ function noise(ctx,dur){
   for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
   return b;
 }
+function unlockAudio(){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended') actx.resume();
+    const b=actx.createBuffer(1,1,22050), s=actx.createBufferSource();
+    s.buffer=b; s.connect(actx.destination); s.start(0);
+  }catch(e){}
+}
+document.addEventListener('touchend',unlockAudio,{once:true});
+document.addEventListener('click',unlockAudio,{once:true});
+
+function tickSound(vol){
+  const ctx=ac(); if(!ctx) return;
+  const t=ctx.currentTime;
+  const s=ctx.createBufferSource(); s.buffer=noise(ctx,.025);
+  const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2400; f.Q.value=2.5;
+  const g=ctx.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0008,t+.025);
+  s.connect(f);f.connect(g);g.connect(ctx.destination); s.start(t); s.stop(t+.03);
+}
+
 function drumHit(ctx,at,vol){
   const s=ctx.createBufferSource();s.buffer=noise(ctx,.06);
   const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=190;f.Q.value=1.2;
@@ -806,14 +826,44 @@ function drawWheel(canvasId,items){
   ctx.fillStyle='#1B1035';ctx.fill();ctx.strokeStyle='#FFD23F';ctx.lineWidth=3;ctx.stroke();
 }
 const rotAcc={gameRot:0,penRot:0};
+/* Gleiche Kurve wie in der CSS-Transition, damit das Klappern exakt mitläuft */
+function bezier(x1,y1,x2,y2){
+  const cx=3*x1, bx=3*(x2-x1)-cx, ax=1-cx-bx;
+  const cy=3*y1, by=3*(y2-y1)-cy, ay=1-cy-by;
+  const fx=t=>((ax*t+bx)*t+cx)*t, fy=t=>((ay*t+by)*t+cy)*t;
+  const dfx=t=>(3*ax*t+2*bx)*t+cx;
+  return x=>{
+    let t=x;
+    for(let i=0;i<8;i++){
+      const e=fx(t)-x; if(Math.abs(e)<1e-5) break;
+      const d=dfx(t); if(Math.abs(d)<1e-6) break;
+      t-=e/d;
+    }
+    return fy(Math.min(1,Math.max(0,t)));
+  };
+}
+const EASE=bezier(.15,.72,.16,1);
 function spinWheel(rotId,n,cb){
   const el=document.getElementById(rotId), idx=rnd(n), seg=360/n;
   const target=(360-(idx*seg+seg/2)+360)%360;
   const current=((rotAcc[rotId]%360)+360)%360;
-  rotAcc[rotId]+=((target-current+360)%360)+360*6;
-  el.style.transition='transform 4.6s cubic-bezier(.15,.72,.16,1)';
+  const delta=((target-current+360)%360)+360*6;
+  rotAcc[rotId]+=delta;
+  const dur=4600;
+  el.style.transition=`transform ${dur}ms cubic-bezier(.15,.72,.16,1)`;
   el.style.transform=`rotate(${rotAcc[rotId]}deg)`;
-  setTimeout(()=>cb(idx),4750);
+  const t0=performance.now();
+  let lastSeg=0, lastTick=0;
+  (function frame(now){
+    const e=Math.min(1,(now-t0)/dur);
+    const s=Math.floor(delta*EASE(e)/seg);
+    if(s>lastSeg){
+      if(now-lastTick>26){ tickSound(.035+.085*(1-e)); lastTick=now; }
+      lastSeg=s;
+    }
+    if(e<1) requestAnimationFrame(frame);
+  })(t0);
+  setTimeout(()=>cb(idx),dur+150);
 }
 
 /* ================= Pools ================= */
@@ -1010,18 +1060,30 @@ function startReact(){
   play.react={phase:'wait',done:false,timers:[],goAt:0};
   const r=play.react;
   setBox('neutral','Achtung…');
-  let t=1600+rnd(2200);
-  const fakes=1+rnd(4);
+
+  /* Rundenlänge würfeln: mal ein Blitzstart, mal eine Zitterpartie */
+  const roll=Math.random();
+  let fakes, start, gapBase, gapRand, finalWait;
+  if(roll<.28){                       // kurz: unter 3 Sekunden
+    fakes=rnd(2);      start=700+rnd(900);   gapBase=450; gapRand=700;  finalWait=500+rnd(1100);
+  }else if(roll<.80){                 // normal: 4 bis 10 Sekunden
+    fakes=1+rnd(3);    start=1300+rnd(1500); gapBase=800; gapRand=1600; finalWait=900+rnd(2400);
+  }else{                              // lang: bis über 20 Sekunden
+    fakes=3+rnd(4);    start=1800+rnd(2200); gapBase=1300;gapRand=2400; finalWait=2200+rnd(5000);
+  }
+
+  let t=start;
   for(let i=0;i<fakes;i++){
-    const f=FAKES[rnd(FAKES.length)], at=t;
+    if(t>12000) break;                // sonst wird es zur Geduldsprobe
+    const f=FAKES[rnd(FAKES.length)], at=t, hold=500+rnd(600);
     r.timers.push(setTimeout(()=>{ if(r.done) return; r.phase='fake'; setBox(f.c,f.m); },at));
-    r.timers.push(setTimeout(()=>{ if(r.done) return; r.phase='wait'; setBox('neutral','…'); },at+850));
-    t=at+850+900+rnd(1900);
+    r.timers.push(setTimeout(()=>{ if(r.done) return; r.phase='wait'; setBox('neutral','…'); },at+hold));
+    t=at+hold+gapBase+rnd(gapRand);
   }
   r.timers.push(setTimeout(()=>{
     if(r.done) return;
     r.phase='go'; r.goAt=Date.now(); setBox('go','JETZT!');
-  }, t+1200+rnd(2800)));
+  }, t+finalWait));
 }
 function nameOf(k){ return state.teams[k==='a'?state.cur.a:state.cur.b].name; }
 function reactTap(k){
